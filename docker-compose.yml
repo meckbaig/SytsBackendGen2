@@ -1,0 +1,11 @@
+version: '3.4'
+
+services:
+  mockesu.web:
+    image: ${DOCKER_REGISTRY-}mockesuweb
+    build:
+      context: .
+      dockerfile: SytsBackendGen2.Web/Dockerfile
+    ports:
+      - "5150:5150"
+      - "7150:7150"

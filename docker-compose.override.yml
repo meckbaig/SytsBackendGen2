@@ -1,0 +1,14 @@
+version: '3.4'
+
+services:
+  mockesu.web:
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_HTTP_PORTS=5150
+      - ASPNETCORE_HTTPS_PORTS=7150
+    ports:
+      - "5150:5150"
+      - "7150:7150"
+    volumes:
+      - ${APPDATA}/Microsoft/UserSecrets:/home/app/.microsoft/usersecrets:ro
+      - ${APPDATA}/ASP.NET/Https:/home/app/.aspnet/https:ro

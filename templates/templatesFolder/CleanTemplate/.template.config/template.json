@@ -1,0 +1,111 @@
+{
+  "$schema": "http://json.schemastore.org/template",
+  "author": "meckbaig",
+  "classifications": [
+    "Clean Architecture"
+  ],
+  "name": "My Clean Architecture Services Template",
+  "description":  "Create a new service method",
+  "identity": "Meckbaig.Clean.Architecture.Methods.CSharp",
+  "groupIdentity": "Meckbaig.Clean.Architecture.CSharp",
+  "shortName": "clean-method",
+  "tags": {
+    "language": "C#",
+    "type": "item"
+  },
+  "sourceName": "ServiceMethod",
+  "preferNameDirectory": false,
+  "symbols": {
+    "DefaultNamespace": {
+      "type": "bind",
+      "binding": "msbuild:RootNamespace",
+      "replaces": "ProjectName.Application",
+      "defaultValue": "ProjectName.Application"
+    },
+    "featureName": {
+      "type": "parameter",
+      "datatype": "string",
+      "isRequired": true,
+      "replaces": "FeatureName",
+      "fileRename": "FeatureName"
+    },
+    "useCaseType": {
+      "type": "parameter",
+      "datatype": "choice",
+      "isRequired": true,
+      "choices": [
+        {
+          "choice": "query-wf",
+          "description": "Create a new query with database collection filters"
+        },
+        {
+          "choice": "jp-command",
+          "description": "Create a new json patch command"
+        },
+        {
+          "choice": "command",
+          "description": "Create a new command"
+        },
+        {
+          "choice": "query",
+          "description": "Create a new query"
+        }
+      ],
+      "description": "The type of use case to create"
+    },
+    "createQueryWithFilters": {
+      "type": "computed",
+      "value": "(useCaseType == \"query-wf\")"
+    },
+    "createJsonPatchCommand": {
+      "type": "computed",
+      "value": "(useCaseType == \"jp-command\")"
+    },
+    "createCommand": {
+      "type": "computed",
+      "value": "(useCaseType == \"command\")"
+    },
+    "createQuery": {
+      "type": "computed",
+      "value": "(useCaseType == \"query\")"
+    }
+  },
+  "sources": [
+    {
+      "modifiers": [
+        {
+          "condition": "(createCommand)",
+          "exclude": [ 
+		    "Services/FeatureName/ServiceMethodQuery.cs",
+			"Services/FeatureName/ServiceMethodFilteredListQuery.cs",
+			"Services/FeatureName/JsonPatchServiceMethodCommand.cs"
+		  ]
+        },
+        {
+          "condition": "(createQuery)",
+          "exclude": [ 
+		    "Services/FeatureName/ServiceMethodCommand.cs",
+			"Services/FeatureName/ServiceMethodFilteredListQuery.cs",
+			"Services/FeatureName/JsonPatchServiceMethodCommand.cs"
+		  ]
+        },
+        {
+          "condition": "(createQueryWithFilters)",
+          "exclude": [ 
+		    "Services/FeatureName/ServiceMethodCommand.cs",
+		    "Services/FeatureName/ServiceMethodQuery.cs",
+			"Services/FeatureName/JsonPatchServiceMethodCommand.cs"
+		  ]
+        },
+        {
+          "condition": "(createJsonPatchCommand)",
+          "exclude": [ 
+		    "Services/FeatureName/ServiceMethodCommand.cs",
+		    "Services/FeatureName/ServiceMethodQuery.cs",
+			"Services/FeatureName/ServiceMethodFilteredListQuery.cs"
+		  ]
+        }
+      ]
+    }
+  ]
+}

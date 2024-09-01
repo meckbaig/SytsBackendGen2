@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <PackageId>Meckbaig.CleanArch.Template</PackageId>
+    <PackageVersion>1.0</PackageVersion>
+    <Title>Meckbaig CleanArch Template</Title>
+    <Authors>Meckbaig</Authors>
+    <Description>Create a new service method</Description>
+    <PackageTags>dotnet-new;templates;C#</PackageTags>
+    <PackageType>Template</PackageType>
+    <TargetFramework>net8.0</TargetFramework>
+    <IncludeContentInPack>true</IncludeContentInPack>
+    <IncludeBuildOutput>false</IncludeBuildOutput>
+    <ContentTargetFolders>content</ContentTargetFolders>
+  </PropertyGroup>
+  
+  <ItemGroup>
+	<Content Include="templatesFolder\**\*"/>
+	<Compile Remove="**\*"/>
+  </ItemGroup>
+  
+</Project>

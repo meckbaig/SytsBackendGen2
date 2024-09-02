@@ -1,6 +1,5 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
-using System.Net.Http.Headers;
 using SytsBackendGen2.Application.Common.Interfaces;
 using SytsBackendGen2.Application.DTOs.Users;
 

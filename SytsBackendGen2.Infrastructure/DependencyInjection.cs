@@ -1,16 +1,11 @@
-using MassTransit;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Configuration;
 using SytsBackendGen2.Application.Common.Interfaces;
-using SytsBackendGen2.Domain.Entities.Authentification;
-using SytsBackendGen2.Infrastructure.AsyncMessaging;
 using SytsBackendGen2.Infrastructure.Authentification.Google;
 using SytsBackendGen2.Infrastructure.Authentification.Jwt;
 using SytsBackendGen2.Infrastructure.Authentification.Permissions;
-using SytsBackendGen2.Infrastructure.Caching;
 using SytsBackendGen2.Infrastructure.Data;
 using SytsBackendGen2.Infrastructure.Interceptors;
 
@@ -45,6 +40,7 @@ public static class DependencyInjection
         services.AddSingleton<IJwtProvider, JwtProvider>();
         services.AddSingleton<IAuthorizationHandler, PermissionAuthorizationHandler>();
         services.AddSingleton<IAuthorizationPolicyProvider, PermissionAuthorizationPolicyProvider>();
+        services.AddHttpClient();
         services.AddSingleton<IGoogleAuthProvider, GoogleAuthProvider>();
         //services.AddTransient<IPasswordHasher<User>, PasswordHasher<User>>();
         //services.AddScoped<ICachedKeysProvider, AsyncSqlCachedKeysProvider>();

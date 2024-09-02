@@ -1,8 +1,6 @@
 using AutoMapper;
 using FluentValidation;
 using SytsBackendGen2.Application.Common.Dtos;
-using SytsBackendGen2.Application.DTOs.Tariffs;
-using SytsBackendGen2.Application.Extensions.Validation;
 using SytsBackendGen2.Domain.Entities.Authentification;
 
 namespace SytsBackendGen2.Application.DTOs.Roles;
@@ -27,7 +25,7 @@ public record RoleEditDto : IEditDto
     {
         public Mapping()
         {
-            CreateMap<Role,  RoleEditDto>()
+            CreateMap<Role, RoleEditDto>()
                 .ForMember(r => r.Name, opt => opt.MapFrom(r => r.Name))
                 .ForMember(r => r.Permissions, opt => opt.MapFrom(r => r.Permissions.Select(p => p.Id)));
             CreateMap<RoleEditDto, Role>()

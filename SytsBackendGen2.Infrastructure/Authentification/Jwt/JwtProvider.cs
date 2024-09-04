@@ -11,8 +11,8 @@ namespace SytsBackendGen2.Infrastructure.Authentification.Jwt;
 
 internal sealed class JwtProvider : IJwtProvider
 {
-    private static readonly TimeSpan TokenLifeTime = TimeSpan.FromMinutes(5);
-    private static readonly TimeSpan RefreshTokenLifeTime = TimeSpan.FromDays(3);
+    private static readonly TimeSpan TokenLifeTime = TimeSpan.FromMinutes(10);
+    private static readonly TimeSpan RefreshTokenLifeTime = TimeSpan.FromDays(14);
     private readonly JwtOptions _options;
 
     public JwtProvider(IOptions<JwtOptions> options)
@@ -98,4 +98,5 @@ internal sealed class JwtProvider : IJwtProvider
 public static class CustomClaim
 {
     public const string UserId = "userId";
+    public const string Permissinos = "permissions";
 }

@@ -7,7 +7,6 @@ namespace SytsBackendGen2.Application.DTOs.Users;
 
 public record UserPreviewDto : IBaseDto
 {
-    public Guid Guid { get; set; }
     public string Name { get; set; }
     public string Email { get; set; }
     public string Role { get; set; }
@@ -24,7 +23,6 @@ public record UserPreviewDto : IBaseDto
         public Mapping()
         {
             CreateMap<User, UserPreviewDto>()
-                .ForMember(m => m.Guid, opt => opt.MapFrom(u => u.Guid))
                 .ForMember(m => m.Email, opt => opt.MapFrom(u => u.Email))
                 .ForMember(m => m.Role, opt => opt.MapFrom(u => u.Role.Name))
                 .ForMember(m => m.YoutubeId, opt => opt.MapFrom(u => u.YoutubeId));

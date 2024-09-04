@@ -2,6 +2,8 @@ namespace SytsBackendGen2.Domain.Enums;
 
 public enum Permission
 {
-    ReadMember = 1,
-    WriteMember = 2
+    PublicDataReader = 1,
+    PublcDataEditor = 2,
+    PrivateDataReader = 3, 
+    PrivateDataEditor = 4
 }

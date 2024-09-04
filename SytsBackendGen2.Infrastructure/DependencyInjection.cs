@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using SytsBackendGen2.Application.Common.Interfaces;
 using SytsBackendGen2.Infrastructure.Authentification.Google;
 using SytsBackendGen2.Infrastructure.Authentification.Jwt;

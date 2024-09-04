@@ -25,7 +25,8 @@ public class GoogleAuthProvider : IGoogleAuthProvider
 
         var responseData = await response.Content.ReadAsStringAsync();
         var userInfo = JsonConvert.DeserializeObject<dynamic>(responseData);
-        UserPreviewDto userDto = new(userInfo.name, userInfo.email, userInfo.picture);
+
+        UserPreviewDto userDto = new(userInfo.name.ToString(), userInfo.email.ToString(), userInfo.picture.ToString());
         //userDto.YoutubeId = await GetYoutubeIdByName(userDto.Name);
 
         return userDto;
@@ -33,6 +34,7 @@ public class GoogleAuthProvider : IGoogleAuthProvider
 
     public async Task<string> GetYoutubeIdByName(string username)
     {
+        _httpClient.DefaultRequestHeaders.Clear();
         var response = await _httpClient.GetAsync(
             $"https://www.googleapis.com/youtube/v3/search?part=snippet&q={username}" +
             $"&type=channel&key={_youtubeKey}");

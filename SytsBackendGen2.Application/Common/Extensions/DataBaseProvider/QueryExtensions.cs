@@ -8,7 +8,8 @@ public static class QueryExtensions
     /// <returns>User with role (including permiissions)</returns>
     public static User? WithRoleByEmail(this IQueryable<User> users, string email)
     {
-        return users.Include(u => u.Role).ThenInclude(r => r.Permissions)
+        return users
+            .Include(u => u.Role).ThenInclude(r => r.Permissions)
             .FirstOrDefault(k => k.Email == email);
     }
 

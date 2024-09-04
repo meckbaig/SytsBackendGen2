@@ -11,13 +11,15 @@ public class Folder : BaseEntity
     public Guid Guid { get; set; }
 
     [Required]
+    [StringLength(50)]
     public string Name { get; set; }
 
     [Required]
+    [ForeignKey(nameof(User))]
     public int UserId { get; set; }
 
-
     [Required]
+    [ForeignKey(nameof(Access))]
     public int AccessId { get; set; } = 2;
 
     public DateTime? LastChannelsUpdate { get; set; }
@@ -34,6 +36,7 @@ public class Folder : BaseEntity
 
     public string? Icon { get; set; }
 
+    [StringLength(11)]
     public string? LastVideoId { get; set; }
 
     [Required]

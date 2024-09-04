@@ -7,9 +7,6 @@ namespace SytsBackendGen2.Domain.Entities.Authentification;
 public class User : BaseEntity, INonDelitableEntity
 {
     [Required]
-    public Guid Guid { get; set; }
-
-    [Required]
     [StringLength(320)]
     public string Email { get; set; }
 
@@ -26,18 +23,17 @@ public class User : BaseEntity, INonDelitableEntity
 
     [Required]
     [Column(TypeName = "json")]
-    public string? SubChannelsJson { get; set; }
+    public string SubChannelsJson { get; set; } = "[]";
 
-    public DateTime? LastChannelsUpdate { get; set; }
+    public DateTimeOffset? LastChannelsUpdate { get; set; }
 
     public Role Role { get; set; }
-    public List<RefreshToken> RefreshTokens { get; set; }
-    public List<Folder> Folders { get; set; }
+    public List<RefreshToken> RefreshTokens { get; set; } = [];
+    public List<Folder> Folders { get; set; } = [];
 
     public User() { }
     public User(string youtubeId, string email)
     {
-        Guid = Guid.NewGuid();
         YoutubeId = youtubeId;
         Email = email;
         RoleId = 1;
@@ -46,6 +42,6 @@ public class User : BaseEntity, INonDelitableEntity
     public void SetSubChannelsJson(string subChannelsJson)
     {
         SubChannelsJson = subChannelsJson;
-        LastChannelsUpdate = DateTime.UtcNow;
+        LastChannelsUpdate = DateTimeOffset.UtcNow;
     }
 }

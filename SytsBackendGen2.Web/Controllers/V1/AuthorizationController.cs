@@ -16,7 +16,7 @@ public class AuthorizationController : ControllerBase
     }
 
     [HttpGet]
-    [Route("Authorize")]
+    [Route("")]
     public async Task<ActionResult<AuthorizeUserResponse>> Authorize([FromQuery] AuthorizeUserCommand query)
     {
         var result = await _mediator.Send(query);

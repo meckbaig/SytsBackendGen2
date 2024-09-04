@@ -3,6 +3,7 @@ using FluentValidation;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using SytsBackendGen2.Application.Common.BaseRequests;
+using SytsBackendGen2.Application.Common.Exceptions;
 using SytsBackendGen2.Application.Common.Interfaces;
 using SytsBackendGen2.Application.DTOs.Users;
 using SytsBackendGen2.Application.Extensions.DataBaseProvider;
@@ -51,26 +52,52 @@ public class AuthorizeUserCommandHandler : IRequestHandler<AuthorizeUserCommand,
 
     public async Task<AuthorizeUserResponse> Handle(AuthorizeUserCommand request, CancellationToken cancellationToken)
     {
-        var userDto = await _googleAuthProvider.AuthorizeAsync(request.accessToken);
-
-        User? user = _context.Users.Include(u => u.RefreshTokens).WithRoleByEmail(userDto.Email);
-        if (user == null)
+        UserPreviewDto? userDto;
+        try
         {
-            string youtubeId = await _googleAuthProvider.GetYoutubeIdByName(request.accessToken);
-
-            user = new(youtubeId, userDto.Email);
-            await _context.Users.AddAsync(user);
-            await _context.SaveChangesAsync();
+            userDto = await _googleAuthProvider.AuthorizeAsync(request.accessToken);
         }
+        catch (HttpRequestException ex)
+        {
+            throw new Common.Exceptions.ValidationException(nameof(request.accessToken), [new ErrorItem(ex.Message, "AccessTokenNotValid")]);
+        }
+        catch (Exception)
+        {
+            throw;
+        }
+
+        User user = await GetOrCreateUserAsync(userDto, cancellationToken);
 
         string jwt = _jwtProvider.GenerateToken(user);
         string refreshToken = _jwtProvider.GenerateRefreshToken(user);
-
         await _context.SaveChangesAsync(cancellationToken);
+
         var previewUserDto = _mapper.Map<UserPreviewDto>(user);
         previewUserDto.Name = userDto.Name;
         previewUserDto.Picture = userDto.Picture;
 
         return new AuthorizeUserResponse { Token = jwt, RefreshToken = refreshToken, UserData = previewUserDto };
+    }
+
+    private async Task<User> GetOrCreateUserAsync(UserPreviewDto? userDto, CancellationToken cancellationToken)
+    {
+        User? user = _context.Users.Include(u => u.RefreshTokens).IgnoreQueryFilters().WithRoleByEmail(userDto.Email);
+        if (user == null)
+        {
+            string youtubeId = await _googleAuthProvider.GetYoutubeIdByName(userDto.Name);
+
+            user = new(youtubeId, userDto.Email);
+            await _context.Users.AddAsync(user, cancellationToken);
+            await _context.SaveChangesAsync(cancellationToken);
+            user.Role = await _context.Roles.FirstOrDefaultAsync(r => r.Id == user.RoleId);
+        }
+        if (user.Deleted)
+        {
+            user.Deleted = false;
+            _context.Users.Update(user);
+            await _context.SaveChangesAsync(cancellationToken);
+        }
+
+        return user;
     }
 }

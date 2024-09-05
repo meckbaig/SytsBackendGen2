@@ -20,6 +20,15 @@ builder.Services.ConfigureOptions<JwtOptionsSetup>();
 builder.Services.ConfigureOptions<JwtBearerOptionsSetup>();
 builder.Services.AddAuthorization();
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll", builder =>
+    {
+        builder.AllowAnyOrigin()
+               .AllowAnyHeader()
+               .AllowAnyMethod();
+    });
+});
 builder.Services.AddControllers().AddNewtonsoftJson();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddTransient<IConfigureOptions<SwaggerGenOptions>, ConfigureSwaggerOptions>();
@@ -79,6 +88,7 @@ if (app.Environment.IsDevelopment())
         }
     });
 }
+app.UseCors("AllowAll");
 
 app.UseHttpsRedirection();
 
@@ -99,10 +109,6 @@ app.Use(async (context, next) =>
 //app.UseSerilogRequestLogging();
 
 app.MapControllers();
-app.UseCors(builder => builder
-     .AllowAnyOrigin()
-     .AllowAnyMethod()
-     .AllowAnyHeader());
 //app.MapEndpoints();
 
 app.Run();

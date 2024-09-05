@@ -1,5 +1,5 @@
 using AutoMapper;
-using Microsoft.EntityFrameworkCore.ChangeTracking;
+using Newtonsoft.Json.Linq;
 using SytsBackendGen2.Application.Common.Dtos;
 using SytsBackendGen2.Domain.Entities.Authentification;
 
@@ -12,6 +12,7 @@ public record UserPreviewDto : IBaseDto
     public string Role { get; set; }
     public string Picture { get; set; }
     public string YoutubeId { get; set; }
+    public JArray SubChannels { get; set; }
 
     public static Type GetOriginType()
     {
@@ -25,7 +26,8 @@ public record UserPreviewDto : IBaseDto
             CreateMap<User, UserPreviewDto>()
                 .ForMember(m => m.Email, opt => opt.MapFrom(u => u.Email))
                 .ForMember(m => m.Role, opt => opt.MapFrom(u => u.Role.Name))
-                .ForMember(m => m.YoutubeId, opt => opt.MapFrom(u => u.YoutubeId));
+                .ForMember(m => m.YoutubeId, opt => opt.MapFrom(u => u.YoutubeId))
+                .ForMember(m => m.SubChannels, opt => opt.MapFrom(u => JArray.Parse(u.SubChannelsJson)));
         }
     }
 

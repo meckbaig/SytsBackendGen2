@@ -26,10 +26,12 @@ public class AuthorizationController : ControllerBase
     [HttpPost]
     [Authorize]
     [Route("RefreshToken")]
-    public async Task<ActionResult<RefreshTokenResponse>> RefreshToken(string refreshToken)
+    public async Task<ActionResult<RefreshTokenResponse>> RefreshToken([FromBody] RefreshTokenBody body)
     {
-        var command = new RefreshTokenCommand { refreshToken = refreshToken, principal = User };
+        var command = new RefreshTokenCommand { refreshToken = body.refreshToken, principal = User };
         var result = await _mediator.Send(command);
         return result.ToJsonResponse();
     }
 }
+
+public sealed record RefreshTokenBody(string refreshToken);

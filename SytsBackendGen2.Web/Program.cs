@@ -92,6 +92,7 @@ app.UseCors("AllowAll");
 
 app.UseHttpsRedirection();
 
+app.UseMiddleware<ExpiredTokenValidationMiddleware>();
 app.UseAuthentication();
 app.UseAuthorization();
 

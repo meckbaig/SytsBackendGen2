@@ -26,7 +26,7 @@ public class Folder : BaseEntity
 
     [Required]
     [Column(TypeName = "json")]
-    public string? SubChannelsJson { get; set; }
+    public string SubChannelsJson { get; set; }
 
     [Required]
     public int ChannelsCount { get; set; } = 0;
@@ -41,7 +41,7 @@ public class Folder : BaseEntity
 
     [Required]
     [Column(TypeName = "json")]
-    public string? YoutubeFolders { get; set; } = "[\"videos\", \"streams\"]";
+    public string YoutubeFolders { get; set; } = "[\"videos\", \"streams\"]";
 
     public User User { get; set; }
     public Access Access { get; set; }

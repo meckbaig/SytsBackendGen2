@@ -50,24 +50,6 @@ public class ValidationException : Exception
     public new IDictionary<string, ErrorItem[]> Errors { get; }
 }
 
-public record ErrorItem
-{
-    public string message { get; set; }
-    public string code { get; set; }
-
-    public ErrorItem(string message, string code)
-    {
-        this.message = message;
-        this.code = code;
-    }
-
-    public ErrorItem(string message, ValidationErrorCode code)
-    {
-        this.message = message;
-        this.code = code.ToString();
-    }
-}
-
 public enum ValidationErrorCode
 {
     NotSpecifiedValidationErrorValidator,

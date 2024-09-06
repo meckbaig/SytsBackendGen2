@@ -4,9 +4,8 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using SytsBackendGen2.Application.Common.BaseRequests;
 using SytsBackendGen2.Application.Common.Interfaces;
-using SytsBackendGen2.Application.DTOs.Users;
+using SytsBackendGen2.Application.DTOs.Folders;
 using SytsBackendGen2.Domain.Entities;
-using SytsBackendGen2.Domain.Entities.Authentification;
 using SytsBackendGen2.Domain.Enums;
 
 namespace SytsBackendGen2.Application.Services.Folders;
@@ -20,7 +19,7 @@ public record GetFoldersQuery : BaseRequest<GetFoldersResponse>
 public class GetFoldersResponse : BaseResponse
 {
     public List<FolderDto> PersonalFolders { get; set; }
-    public List<FolderDto> PublicFolders { get; set;}
+    public List<FolderDto> PublicFolders { get; set; }
 }
 
 public class GetFoldersQueryValidator : AbstractValidator<GetFoldersQuery>
@@ -64,7 +63,7 @@ internal static class GetFoldersQueryValidationExpressions
             if (userId > 0)
                 return context.Users.Any(u => u.Id == userId);
             return false;
-        } 
+        }
         return true;
     }
 }
@@ -89,9 +88,9 @@ public class GetFoldersQueryHandler : IRequestHandler<GetFoldersQuery, GetFolder
         }
         var publicFolders = await GetPublicFolders(request.userId);
 
-        return new() 
-        { 
-            PersonalFolders = personalFolders.Select(_mapper.Map<FolderDto>).ToList(), 
+        return new()
+        {
+            PersonalFolders = personalFolders.Select(_mapper.Map<FolderDto>).ToList(),
             PublicFolders = publicFolders.Select(_mapper.Map<FolderDto>).ToList()
         };
     }

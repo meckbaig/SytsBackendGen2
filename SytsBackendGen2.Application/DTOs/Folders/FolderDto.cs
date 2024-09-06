@@ -3,7 +3,7 @@ using Newtonsoft.Json.Linq;
 using SytsBackendGen2.Application.Common.Dtos;
 using SytsBackendGen2.Domain.Entities;
 
-namespace SytsBackendGen2.Application.DTOs.Users;
+namespace SytsBackendGen2.Application.DTOs.Folders;
 
 public record FolderDto : IBaseDto
 {

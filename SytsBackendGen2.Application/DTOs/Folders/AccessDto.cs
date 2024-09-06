@@ -1,9 +1,8 @@
 using AutoMapper;
 using SytsBackendGen2.Application.Common.Dtos;
 using SytsBackendGen2.Domain.Entities;
-using SytsBackendGen2.Domain.Entities.Authentification;
 
-namespace SytsBackendGen2.Application.DTOs.Users;
+namespace SytsBackendGen2.Application.DTOs.Folders;
 
 public record AccessDto : IBaseDto
 {

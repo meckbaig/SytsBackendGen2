@@ -5,11 +5,11 @@ namespace SytsBackendGen2.Application.Common.Interfaces;
 
 public interface IJwtProvider
 {
-    /// <summary>
-    /// Gets refresh token lifetime.
-    /// </summary>
-    /// <returns>Refresh token lifetime.</returns>
-    TimeSpan GetRefreshTokenLifeTime();
+    ///// <summary>
+    ///// Gets refresh token lifetime.
+    ///// </summary>
+    ///// <returns>Refresh token lifetime.</returns>
+    //TimeSpan GetRefreshTokenLifeTime();
 
     /// <summary>
     /// Generates JWT for provided user.

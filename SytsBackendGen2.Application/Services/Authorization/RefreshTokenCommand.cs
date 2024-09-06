@@ -73,6 +73,7 @@ public class RefreshTokenCommandHandler : IRequestHandler<RefreshTokenCommand, R
         {
             if (token?.Invalidated ?? false)
                 await TryInvalidateAllUserRefreshTokensAsync(userId);
+            await _context.SaveChangesAsync();
 
             throw new Common.Exceptions.ValidationException(
                 nameof(request.refreshToken),
@@ -82,7 +83,7 @@ public class RefreshTokenCommandHandler : IRequestHandler<RefreshTokenCommand, R
         {
             throw new Common.Exceptions.ValidationException(
                 nameof(request.refreshToken),
-                [new ErrorItem($"Refresh token has expired.", ValidationErrorCode.RefreshTokenHasExpired)]);
+                [new ErrorItem($"Refresh token has expired.", ValidationErrorCode.RefreshTokenExpired)]);
         }
     }
 

@@ -80,5 +80,5 @@ public enum ValidationErrorCode
 
     EntityIdValidator,
     RefreshTokenNotValid,
-    RefreshTokenHasExpired
+    RefreshTokenExpired
 }

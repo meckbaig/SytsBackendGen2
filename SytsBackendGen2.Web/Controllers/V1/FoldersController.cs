@@ -19,10 +19,23 @@ public class FoldersController : ControllerBase
     }
 
     [HttpGet]
-    [Route("")]
     public async Task<ActionResult<GetFoldersResponse>> GetFolders()
     {
         GetFoldersQuery query = new() { loggedIn = User.Identity.IsAuthenticated };
+        if (User.Identity.IsAuthenticated)
+        {
+            if (int.TryParse(User.Claims.First(c => c.Type == CustomClaim.UserId).Value, out int userId))
+                query.userId = userId;
+        }
+        var result = await _mediator.Send(query);
+        return result.ToJsonResponse();
+    }
+
+    [HttpGet]
+    [Route("{guid}")]
+    public async Task<ActionResult<GetFolderResponse>> GetFolder(Guid guid)
+    {
+        GetFolderQuery query = new() { loggedIn = User.Identity.IsAuthenticated, guid = guid };
         if (User.Identity.IsAuthenticated)
         {
             if (int.TryParse(User.Claims.First(c => c.Type == CustomClaim.UserId).Value, out int userId))

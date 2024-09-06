@@ -2,7 +2,10 @@ namespace SytsBackendGen2.Infrastructure.Authentification.Jwt;
 
 public class JwtOptions
 {
-    public string Issuer { get; init; }
-    public string Audience { get; init; }
-    public string SecretKey { get; init; }
+    public required string Issuer { get; init; }
+    public required string Audience { get; init; }
+    public required string SecretKey { get; init; }
+    public required string SecretKeyFake { get; init; }
+    public int TokenLifetimeMinutes { get; init; }
+    public int RefreshTokenLifetimeDays { get; init; }
 }

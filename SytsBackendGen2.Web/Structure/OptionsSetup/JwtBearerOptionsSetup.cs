@@ -31,7 +31,7 @@ public class JwtBearerOptionsSetup : IPostConfigureOptions<JwtBearerOptions>
             ValidAudience = _jwtOptions.Audience,
             IssuerSigningKey = new SymmetricSecurityKey(
                 Encoding.UTF8.GetBytes(_jwtOptions.SecretKey)),
-            ClockSkew = /*Debugger.IsAttached ? TimeSpan.Zero :*/ _jwtProvider.GetRefreshTokenLifeTime()
+            ClockSkew = TimeSpan.FromDays(_jwtOptions.RefreshTokenLifetimeDays)
         };
     }
 }

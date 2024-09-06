@@ -11,8 +11,6 @@ namespace SytsBackendGen2.Infrastructure.Authentification.Jwt;
 
 internal sealed class JwtProvider : IJwtProvider
 {
-    private static readonly TimeSpan TokenLifeTime = TimeSpan.FromMinutes(10);
-    private static readonly TimeSpan RefreshTokenLifeTime = TimeSpan.FromDays(14);
     private readonly JwtOptions _options;
 
     public JwtProvider(IOptions<JwtOptions> options)
@@ -24,8 +22,6 @@ internal sealed class JwtProvider : IJwtProvider
     {
         _options = options;
     }
-
-    public TimeSpan GetRefreshTokenLifeTime() => RefreshTokenLifeTime;
 
     public string GenerateToken(
         User user,
@@ -49,7 +45,7 @@ internal sealed class JwtProvider : IJwtProvider
         var tokenDesctiptor = new SecurityTokenDescriptor
         {
             Subject = new ClaimsIdentity(claims),
-            Expires = DateTime.UtcNow.Add(tokenLifeTime ?? TokenLifeTime),
+            Expires = DateTime.UtcNow.Add(tokenLifeTime ?? TimeSpan.FromMinutes(_options.TokenLifetimeMinutes)),
             Issuer = _options.Issuer,
             Audience = _options.Audience,
             SigningCredentials = new SigningCredentials(
@@ -88,7 +84,7 @@ internal sealed class JwtProvider : IJwtProvider
                 .Invalidated = true;
         }
         user.RefreshTokens
-            .Add(new(refreshToken, DateTimeOffset.UtcNow.Add(RefreshTokenLifeTime)));
+            .Add(new(refreshToken, DateTimeOffset.UtcNow.Add(TimeSpan.FromDays(_options.RefreshTokenLifetimeDays))));
 
 
         return refreshToken;

@@ -1,18 +1,34 @@
 using FluentValidation;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using SytsBackendGen2.Application.Common.Interfaces;
-using SytsBackendGen2.Domain.Enums;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 
 namespace SytsBackendGen2.Application.Extensions.Validation;
 
 internal static class ValidationExpressions
 {
+    public static IRuleBuilderOptions<T, int> MustHaveValidUserId
+        <T>(this IRuleBuilder<T, int> ruleBuilder, IAppDbContext context)
+    {
+        return ruleBuilder.Must((q, p) => HaveValidUserId(p, context))
+            .WithMessage((q, p) => $"User Id is not valid")
+            .WithErrorCode("NotValidUserId");
+    }
 
+    private static bool HaveValidUserId(int userId, IAppDbContext context)
+    {
+        if (userId > 0)
+            return context.Users.Any(u => u.Id == userId);
+        return false;
+    }
+    public static IRuleBuilderOptions<T, Guid> MustHaveValidFolderGuid
+        <T>(this IRuleBuilder<T, Guid> ruleBuilder, IAppDbContext context)
+    {
+        return ruleBuilder.Must((q, p) => HaveValidFolderGuid(p, context))
+            .WithMessage((q, p) => $"Folder guid is not valid")
+            .WithErrorCode("NotValidFolderGuid");
+    }
+
+    private static bool HaveValidFolderGuid(Guid folderGuid, IAppDbContext context)
+    {
+        return context.Folders.Any(u => u.Guid == folderGuid);
+    }
 }

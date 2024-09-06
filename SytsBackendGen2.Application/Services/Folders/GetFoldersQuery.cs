@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using SytsBackendGen2.Application.Common.BaseRequests;
 using SytsBackendGen2.Application.Common.Interfaces;
 using SytsBackendGen2.Application.DTOs.Folders;
+using SytsBackendGen2.Application.Extensions.Validation;
 using SytsBackendGen2.Domain.Entities;
 using SytsBackendGen2.Domain.Enums;
 
@@ -26,45 +27,7 @@ public class GetFoldersQueryValidator : AbstractValidator<GetFoldersQuery>
 {
     public GetFoldersQueryValidator(IAppDbContext context)
     {
-        RuleFor(x => x).MustHaveZeroIdWhenNotLoggedIn();
-        RuleFor(x => x).MustHaveValidIdWhenLoggedIn(context);
-    }
-}
-
-internal static class GetFoldersQueryValidationExpressions
-{
-    public static IRuleBuilderOptions<GetFoldersQuery, GetFoldersQuery> MustHaveZeroIdWhenNotLoggedIn
-        (this IRuleBuilder<GetFoldersQuery, GetFoldersQuery> ruleBuilder)
-    {
-        return ruleBuilder.Must((q, p) => HaveZeroIdWhenNotLoggedIn(p.userId, p.loggedIn))
-            .WithMessage((q, p) => $"Internal error: User is no logged in, but user Id is present")
-            .WithErrorCode("NotLoggedUserWuthId");
-    }
-
-    private static bool HaveZeroIdWhenNotLoggedIn(int userId, bool loggedIn)
-    {
-        if (!loggedIn)
-            return userId == 0;
-        return true;
-    }
-
-    public static IRuleBuilderOptions<GetFoldersQuery, GetFoldersQuery> MustHaveValidIdWhenLoggedIn
-        (this IRuleBuilder<GetFoldersQuery, GetFoldersQuery> ruleBuilder, IAppDbContext context)
-    {
-        return ruleBuilder.Must((q, p) => HaveValidIdWhenLoggedIn(p.userId, p.loggedIn, context))
-            .WithMessage((q, p) => $"User Id is not valid")
-            .WithErrorCode("NotValidUserId");
-    }
-
-    private static bool HaveValidIdWhenLoggedIn(int userId, bool loggedIn, IAppDbContext context)
-    {
-        if (loggedIn)
-        {
-            if (userId > 0)
-                return context.Users.Any(u => u.Id == userId);
-            return false;
-        }
-        return true;
+        RuleFor(x => x.userId).MustHaveValidUserId(context);
     }
 }
 

@@ -9,6 +9,7 @@ using SytsBackendGen2.Infrastructure.Authentification.Jwt;
 using SytsBackendGen2.Infrastructure.Authentification.Permissions;
 using SytsBackendGen2.Infrastructure.Data;
 using SytsBackendGen2.Infrastructure.Interceptors;
+using SytsBackendGen2.Infrastructure.VideosFetching;
 
 namespace Microsoft.Extensions.DependencyInjection;
 
@@ -43,6 +44,7 @@ public static class DependencyInjection
         services.AddSingleton<IAuthorizationPolicyProvider, PermissionAuthorizationPolicyProvider>();
         services.AddHttpClient();
         services.AddSingleton<IGoogleAuthProvider, GoogleAuthProvider>();
+        services.AddTransient<IVideoFetcher, VideoFetcher>();
         //services.AddTransient<IPasswordHasher<User>, PasswordHasher<User>>();
         //services.AddScoped<ICachedKeysProvider, AsyncSqlCachedKeysProvider>();
         //services.AddMassTransit(configurator =>

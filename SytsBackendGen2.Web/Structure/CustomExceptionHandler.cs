@@ -24,7 +24,7 @@ public class CustomExceptionHandler : IExceptionHandler
             { typeof(JsonPatchExceptionWithPosition), HandleJsonPatchException },
             //{ typeof(NotFoundException), HandleNotFoundException },
             //{ typeof(UnauthorizedAccessException), HandleUnauthorizedAccessException },
-            //{ typeof(ForbiddenAccessException), HandleForbiddenAccessException },
+            { typeof(ForbiddenAccessException), HandleForbiddenAccessException },
         };
     }
 
@@ -65,9 +65,8 @@ public class CustomExceptionHandler : IExceptionHandler
     private async Task HandleValidationException(HttpContext httpContext, Exception ex)
     {
         httpContext.Response.StatusCode = StatusCodes.Status400BadRequest;
-        if (ex as ValidationException != null)
+        if (ex is ValidationException exception)
         {
-            var exception = (ValidationException)ex;
             await httpContext.Response.WriteAsJsonAsync(new CustomValidationProblemDetails(exception.Errors)
             {
                 Status = httpContext.Response.StatusCode,
@@ -104,42 +103,22 @@ public class CustomExceptionHandler : IExceptionHandler
 
     }
 
-    //private async Task HandleNotFoundException(HttpContext httpContext, Exception ex)
-    //{
-    //    var exception = (NotFoundException)ex;
+    private async Task HandleForbiddenAccessException(HttpContext httpContext, Exception ex)
+    {
+        httpContext.Response.StatusCode = StatusCodes.Status403Forbidden;
 
-    //    httpContext.Response.StatusCode = StatusCodes.Status404NotFound;
+        if (ex is ForbiddenAccessException exception)
+        {
+            await httpContext.Response.WriteAsJsonAsync(new 
+            {
+                Status = StatusCodes.Status403Forbidden,
+                Title = "Access denied",
+                Type = "https://tools.ietf.org/html/rfc7231#section-6.5.3",
+                Errors = new Dictionary<string, ErrorItem[]>
+                {
 
-    //    await httpContext.Response.WriteAsJsonAsync(new ProblemDetails()
-    //    {
-    //        Status = StatusCodes.Status404NotFound,
-    //        Type = "https://tools.ietf.org/html/rfc7231#section-6.5.4",
-    //        Title = "The specified resource was not found.",
-    //        Detail = exception.Message
-    //    });
-    //}
-
-    //private async Task HandleUnauthorizedAccessException(HttpContext httpContext, Exception ex)
-    //{
-    //    httpContext.Response.StatusCode = StatusCodes.Status401Unauthorized;
-
-    //    await httpContext.Response.WriteAsJsonAsync(new ProblemDetails
-    //    {
-    //        Status = StatusCodes.Status401Unauthorized,
-    //        Title = "Unauthorized",
-    //        Type = "https://tools.ietf.org/html/rfc7235#section-3.1"
-    //    });
-    //}
-
-    //private async Task HandleForbiddenAccessException(HttpContext httpContext, Exception ex)
-    //{
-    //    httpContext.Response.StatusCode = StatusCodes.Status403Forbidden;
-
-    //    await httpContext.Response.WriteAsJsonAsync(new ProblemDetails
-    //    {
-    //        Status = StatusCodes.Status403Forbidden,
-    //        Title = "Forbidden",
-    //        Type = "https://tools.ietf.org/html/rfc7231#section-6.5.3"
-    //    });
-    //}
+                }
+            });
+        }
+    }
 }

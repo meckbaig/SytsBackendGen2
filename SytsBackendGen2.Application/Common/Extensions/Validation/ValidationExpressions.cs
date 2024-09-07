@@ -9,7 +9,7 @@ internal static class ValidationExpressions
         <T>(this IRuleBuilder<T, int> ruleBuilder, IAppDbContext context)
     {
         return ruleBuilder.Must((q, p) => HaveValidUserId(p, context))
-            .WithMessage((q, p) => $"User Id is not valid")
+            .WithMessage($"User Id is not valid")
             .WithErrorCode("NotValidUserId");
     }
 
@@ -23,7 +23,7 @@ internal static class ValidationExpressions
         <T>(this IRuleBuilder<T, Guid> ruleBuilder, IAppDbContext context)
     {
         return ruleBuilder.Must((q, p) => HaveValidFolderGuid(p, context))
-            .WithMessage((q, p) => $"Folder guid is not valid")
+            .WithMessage($"Folder guid is not valid")
             .WithErrorCode("NotValidFolderGuid");
     }
 

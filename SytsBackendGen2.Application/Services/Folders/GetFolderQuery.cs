@@ -2,6 +2,7 @@
 using FluentValidation;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using SytsBackendGen2.Application.Common.Attributes;
 using SytsBackendGen2.Application.Common.BaseRequests;
 using SytsBackendGen2.Application.Common.BaseRequests.AuthentificatedRequest;
 using SytsBackendGen2.Application.Common.Exceptions;
@@ -15,15 +16,17 @@ namespace SytsBackendGen2.Application.Services.Folders;
 public record GetFolderQuery : BaseAuthentificatedRequest<GetFolderResponse>
 {
     public Guid guid { get; set; }
+    public bool info { get; set; }
     internal override bool loggedIn { get; set; }
     internal override int userId { get; set; }
-
 }
 
 public class GetFolderResponse : BaseResponse
 {
     public required FolderDto Folder { get; set; }
-    public required List<VideoDto> Videos { get; set; }
+
+    [IgnoreIfNull]
+    public List<VideoDto>? Videos { get; set; }
 }
 
 public class GetFolderQueryValidator : AbstractValidator<GetFolderQuery>
@@ -68,24 +71,27 @@ public class GetFolderQueryHandler : IRequestHandler<GetFolderQuery, GetFolderRe
                 [new ErrorItem("User doesn't have access to this folder.", ForbiddenAccessErrorCode.ForbiddenAccessValidator)]);
         }
 
-        var folderDto = _mapper.Map<FolderDto>(folder);
+        FolderDto folderDto = _mapper.Map<FolderDto>(folder);
+        List<VideoDto> videos = null;
 
-
-        await _videoFetcher.Fetch(folderDto.SubChannels, folderDto.YoutubeFolders, folderDto.ChannelsCount);
-        var dynamicVideosList = _videoFetcher.ToList(out string firstVideoId, folder.LastVideoId);
-        if (firstVideoId != null)
+        if (!request.info)
         {
-            folder.LastVideoId = firstVideoId;
-            folder.LastVideosAccess = folderDto.LastVideosAccess = DateTime.UtcNow;
-            _context.SaveChanges();
+            await _videoFetcher.Fetch(folderDto.SubChannels, folderDto.YoutubeFolders, folderDto.ChannelsCount);
+            var dynamicVideosList = _videoFetcher.ToList(out string firstVideoId, folder.LastVideoId);
+            videos = _mapper.Map<List<VideoDto>>(dynamicVideosList);
+
+            if (firstVideoId != null)
+            {
+                folder.LastVideoId = firstVideoId;
+                folder.LastVideosAccess = folderDto.LastVideosAccess = DateTime.UtcNow;
+                _context.SaveChanges();
+            }
         }
 
-        var response = new GetFolderResponse
+        return new GetFolderResponse
         {
             Folder = folderDto,
-            Videos = _mapper.Map<List<VideoDto>>(dynamicVideosList)
+            Videos = videos
         };
-
-        return response;
     }
 }

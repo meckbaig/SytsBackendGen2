@@ -33,9 +33,9 @@ public class FoldersController : ControllerBase
 
     [HttpGet]
     [Route("{guid}")]
-    public async Task<ActionResult<GetFolderResponse>> GetFolder(Guid guid)
+    public async Task<ActionResult<GetFolderResponse>> GetFolder(Guid guid, [FromQuery] bool info = false)
     {
-        var query = new GetFolderQuery() { guid = guid };
+        var query = new GetFolderQuery() { guid = guid, info = info };
         if (User.Identity.IsAuthenticated)
         {
             if (int.TryParse(User.Claims.First(c => c.Type == CustomClaim.UserId).Value, out int userId))

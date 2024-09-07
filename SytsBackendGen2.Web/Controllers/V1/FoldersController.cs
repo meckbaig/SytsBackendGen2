@@ -53,4 +53,17 @@ public class FoldersController : ControllerBase
         var result = await _mediator.Send(command);
         return result.ToJsonResponse();
     }
+
+    [HttpDelete]
+    [HasPermission(Permission.PrivateDataEditor)]
+    [Route("{guid}")]
+    public async Task<ActionResult<DeleteFolderResponse>> DeleteFolder(Guid guid)
+    {
+        var command = new DeleteFolderCommand() { guid = guid };
+        if (int.TryParse(User.Claims.First(c => c.Type == CustomClaim.UserId).Value, out int userId))
+            command.SetUserId(userId);
+        var result = await _mediator.Send(command);
+        return result.ToJsonResponse();
+    }
+
 }

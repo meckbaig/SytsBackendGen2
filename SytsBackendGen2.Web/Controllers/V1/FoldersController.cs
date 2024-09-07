@@ -44,4 +44,13 @@ public class FoldersController : ControllerBase
         var result = await _mediator.Send(query);
         return result.ToJsonResponse();
     }
+    [HttpPost]
+    [HasPermission(Permission.PrivateDataEditor)]
+    public async Task<ActionResult<CreateFolderResponse>> CreateFolder(CreateFolderCommand command)
+    {
+        if (int.TryParse(User.Claims.First(c => c.Type == CustomClaim.UserId).Value, out int userId))
+            command.SetUserId(userId);
+        var result = await _mediator.Send(command);
+        return result.ToJsonResponse();
+    }
 }

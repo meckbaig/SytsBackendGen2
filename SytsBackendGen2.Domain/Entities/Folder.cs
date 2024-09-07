@@ -27,7 +27,7 @@ public class Folder : BaseEntity
 
     [Required]
     [Column(TypeName = "json")]
-    public string SubChannelsJson { get; set; }
+    public string SubChannelsJson { get; set; } = "[]";
 
     [Required]
     public int ChannelsCount { get; set; } = 0;

@@ -23,6 +23,7 @@ public class Folder : BaseEntity
     public int AccessId { get; set; } = 2;
 
     public DateTime? LastChannelsUpdate { get; set; }
+    public DateTime? LastVideosAccess { get; set; }
 
     [Required]
     [Column(TypeName = "json")]

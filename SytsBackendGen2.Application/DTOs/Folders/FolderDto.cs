@@ -10,6 +10,7 @@ public record FolderDto : IBaseDto
     public Guid Guid { get; set; }
     public string Name { get; set; }
     public DateTime? LastChannelsUpdate { get; set; }
+    public DateTime? LastVideosAccess { get; set; }
     public JArray SubChannels { get; set; }
     public int ChannelsCount { get; set; } = 0;
     public string? Color { get; set; } = "#ffffff";

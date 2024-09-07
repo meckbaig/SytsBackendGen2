@@ -75,6 +75,7 @@ public class GetFolderQueryHandler : IRequestHandler<GetFolderQuery, GetFolderRe
         if (firstVideoId != null)
         {
             folder.LastVideoId = firstVideoId;
+            folder.LastVideosAccess = folderDto.LastVideosAccess = DateTime.UtcNow;
             _context.SaveChanges();
         }
 

@@ -22,8 +22,8 @@ public record GetFolderQuery : BaseAuthentificatedRequest<GetFolderResponse>
 
 public class GetFolderResponse : BaseResponse
 {
-    public FolderDto Folder { get; set; }
-    public List<VideoDto> Videos { get; set; }
+    public required FolderDto Folder { get; set; }
+    public required List<VideoDto> Videos { get; set; }
 }
 
 public class GetFolderQueryValidator : AbstractValidator<GetFolderQuery>

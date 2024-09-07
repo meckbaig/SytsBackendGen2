@@ -13,14 +13,14 @@ namespace SytsBackendGen2.Application.Services.Authorization;
 
 public record AuthorizeUserCommand : BaseRequest<AuthorizeUserResponse>
 {
-    public string accessToken { get; set; }
+    public required string accessToken { get; set; }
 }
 
 public class AuthorizeUserResponse : BaseResponse
 {
-    public string Token { get; set; }
-    public string RefreshToken { get; set; }
-    public UserPreviewDto UserData { get; set; }
+    public required string Token { get; set; }
+    public required string RefreshToken { get; set; }
+    public required UserPreviewDto UserData { get; set; }
 }
 
 public class AuthorizeUserCommandValidator : AbstractValidator<AuthorizeUserCommand>

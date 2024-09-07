@@ -14,14 +14,14 @@ namespace SytsBackendGen2.Application.Services.Authorization;
 
 public record RefreshTokenCommand : BaseAuthentificatedRequest<RefreshTokenResponse>
 {
-    public string refreshToken { get; set; }
+    public required string refreshToken { get; set; }
     internal override int userId { get; set; }
 }
 
 public class RefreshTokenResponse : BaseResponse
 {
-    public string Token { get; set; }
-    public string RefreshToken { get; set; }
+    public required string Token { get; set; }
+    public required string RefreshToken { get; set; }
 }
 
 public class RefreshTokenCommandValidator : AbstractValidator<RefreshTokenCommand>

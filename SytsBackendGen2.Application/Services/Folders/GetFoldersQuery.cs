@@ -20,8 +20,8 @@ public record GetFoldersQuery : BaseAuthentificatedRequest<GetFoldersResponse>
 
 public class GetFoldersResponse : BaseResponse
 {
-    public List<FolderDto> PersonalFolders { get; set; }
-    public List<FolderDto> PublicFolders { get; set; }
+    public required List<FolderDto> PersonalFolders { get; set; }
+    public required List<FolderDto> PublicFolders { get; set; }
 }
 
 public class GetFoldersQueryValidator : AbstractValidator<GetFoldersQuery>

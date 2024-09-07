@@ -8,13 +8,14 @@ using SytsBackendGen2.Application.Common.Interfaces;
 using SytsBackendGen2.Application.Extensions.DataBaseProvider;
 using SytsBackendGen2.Domain.Entities.Authentification;
 using System.Security.Claims;
+using SytsBackendGen2.Application.Common.BaseRequests.AuthentificatedRequest;
 
 namespace SytsBackendGen2.Application.Services.Authorization;
 
-public record RefreshTokenCommand : BaseRequest<RefreshTokenResponse>
+public record RefreshTokenCommand : BaseAuthentificatedRequest<RefreshTokenResponse>
 {
     public string refreshToken { get; set; }
-    public ClaimsPrincipal principal { get; set; }
+    internal override int userId { get; set; }
 }
 
 public class RefreshTokenResponse : BaseResponse
@@ -45,12 +46,11 @@ public class RefreshTokenCommandHandler : IRequestHandler<RefreshTokenCommand, R
     {
         request.refreshToken = request.refreshToken.Replace(' ', '+');
 
-        int userId = _jwtProvider.GetUserIdFromClaimsPrincipal(request.principal);
         User user = _context.Users
             .Include(u => u.RefreshTokens.Where(t => t.Token.Equals(request.refreshToken)))
-            .WithRoleById(userId);
+            .WithRoleById(request.userId);
 
-        await ValidateUserAndToken(user, userId, request);
+        await ValidateUserAndToken(user, request.userId, request);
 
         string jwt = _jwtProvider.GenerateToken(user);
         string refreshToken = _jwtProvider.GenerateRefreshToken(user, request.refreshToken);

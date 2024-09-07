@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using SytsBackendGen2.Application.Services.Authorization;
+using SytsBackendGen2.Infrastructure.Authentification.Jwt;
 
 namespace SytsBackendGen2.Web.Controllers.V1;
 
@@ -26,12 +27,11 @@ public class AuthorizationController : ControllerBase
     [HttpPost]
     [Authorize]
     [Route("RefreshToken")]
-    public async Task<ActionResult<RefreshTokenResponse>> RefreshToken([FromBody] RefreshTokenBody body)
+    public async Task<ActionResult<RefreshTokenResponse>> RefreshToken([FromBody] RefreshTokenCommand command)
     {
-        var command = new RefreshTokenCommand { refreshToken = body.refreshToken, principal = User };
+        if (int.TryParse(User.Claims.First(c => c.Type == CustomClaim.UserId).Value, out int userId))
+            command.SetUserId(userId);
         var result = await _mediator.Send(command);
         return result.ToJsonResponse();
     }
 }
-
-public sealed record RefreshTokenBody(string refreshToken);

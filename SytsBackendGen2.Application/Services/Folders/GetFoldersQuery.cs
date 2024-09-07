@@ -3,6 +3,7 @@ using FluentValidation;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using SytsBackendGen2.Application.Common.BaseRequests;
+using SytsBackendGen2.Application.Common.BaseRequests.AuthentificatedRequest;
 using SytsBackendGen2.Application.Common.Interfaces;
 using SytsBackendGen2.Application.DTOs.Folders;
 using SytsBackendGen2.Application.Extensions.Validation;
@@ -11,10 +12,10 @@ using SytsBackendGen2.Domain.Enums;
 
 namespace SytsBackendGen2.Application.Services.Folders;
 
-public record GetFoldersQuery : BaseRequest<GetFoldersResponse>
+public record GetFoldersQuery : BaseAuthentificatedRequest<GetFoldersResponse>
 {
-    public int userId { get; set; }
-    public bool loggedIn { get; set; }
+    internal override int userId { get; set; }
+    internal override bool loggedIn { get; set; }
 }
 
 public class GetFoldersResponse : BaseResponse

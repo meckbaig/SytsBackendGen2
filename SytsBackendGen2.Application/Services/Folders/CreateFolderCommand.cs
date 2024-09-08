@@ -4,6 +4,7 @@ using MediatR;
 using SytsBackendGen2.Application.Common.BaseRequests;
 using SytsBackendGen2.Application.Common.BaseRequests.AuthentificatedRequest;
 using SytsBackendGen2.Application.Common.Interfaces;
+using SytsBackendGen2.Application.DTOs.Folders;
 using SytsBackendGen2.Application.Extensions.Validation;
 using SytsBackendGen2.Domain.Entities;
 
@@ -17,7 +18,7 @@ public record CreateFolderCommand : BaseAuthentificatedRequest<CreateFolderRespo
 
 public class CreateFolderResponse : BaseResponse
 {
-	
+	public required FolderDto Folder { get; set; }
 }
 
 public class CreateFolderCommandValidator : AbstractValidator<CreateFolderCommand>
@@ -46,6 +47,6 @@ public class CreateFolderCommandHandler : IRequestHandler<CreateFolderCommand, C
         _context.Folders.Add(folder);
         await _context.SaveChangesAsync();
 
-        return new CreateFolderResponse();
+        return new CreateFolderResponse() { Folder = _mapper.Map<FolderDto>(folder) };
     }
 }

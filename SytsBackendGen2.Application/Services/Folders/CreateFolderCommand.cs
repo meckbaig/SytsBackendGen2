@@ -5,6 +5,7 @@ using SytsBackendGen2.Application.Common.BaseRequests;
 using SytsBackendGen2.Application.Common.BaseRequests.AuthentificatedRequest;
 using SytsBackendGen2.Application.Common.Interfaces;
 using SytsBackendGen2.Application.DTOs.Folders;
+using SytsBackendGen2.Application.Extensions.DataBaseProvider;
 using SytsBackendGen2.Application.Extensions.Validation;
 using SytsBackendGen2.Domain.Entities;
 
@@ -46,6 +47,7 @@ public class CreateFolderCommandHandler : IRequestHandler<CreateFolderCommand, C
         Folder folder = new(request.userId, request.name);
         _context.Folders.Add(folder);
         await _context.SaveChangesAsync();
+        folder = await _context.Folders.WithAccessByGuidAsync(folder.Guid);
 
         return new CreateFolderResponse() { Folder = _mapper.Map<FolderDto>(folder) };
     }

@@ -49,7 +49,7 @@ public class DeleteFolderCommandHandler : IRequestHandler<DeleteFolderCommand, D
          {
             throw new ForbiddenAccessException(
                 nameof(request.guid),
-                [new ErrorItem($"User {request.userId} is not owner of folder {request.guid}.", 
+                [new ErrorItem($"User '{request.userId}' is not owner of folder '{request.guid}'.", 
                     ForbiddenAccessErrorCode.ForbiddenAccessValidator)]);
         }
 

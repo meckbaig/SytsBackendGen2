@@ -1,4 +1,3 @@
-using Microsoft.AspNetCore.Authorization;
 using SytsBackendGen2.Application.Services.Folders;
 using SytsBackendGen2.Domain.Enums;
 using SytsBackendGen2.Infrastructure.Authentification.Jwt;
@@ -44,6 +43,19 @@ public class FoldersController : ControllerBase
         var result = await _mediator.Send(query);
         return result.ToJsonResponse();
     }
+
+    [HttpPut]
+    [HasPermission(Permission.PrivateDataEditor)]
+    [Route("{guid}")]
+    public async Task<ActionResult<UpdateFolderResponse>> UpdateFolder(Guid guid, [FromBody] UpdateFolderCommand command)
+    {
+        command.SetFolderGuid(guid);
+        if (int.TryParse(User.Claims.First(c => c.Type == CustomClaim.UserId).Value, out int userId))
+            command.SetUserId(userId);
+        var result = await _mediator.Send(command);
+        return result.ToJsonResponse();
+    }
+
     [HttpPost]
     [HasPermission(Permission.PrivateDataEditor)]
     public async Task<ActionResult<CreateFolderResponse>> CreateFolder(CreateFolderCommand command)

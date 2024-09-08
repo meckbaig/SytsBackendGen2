@@ -81,7 +81,10 @@ public class AuthorizeUserCommandHandler : IRequestHandler<AuthorizeUserCommand,
 
     private async Task<User> GetOrCreateUserAsync(UserPreviewDto? userDto, CancellationToken cancellationToken)
     {
-        User? user = _context.Users.Include(u => u.RefreshTokens).IgnoreQueryFilters().WithRoleByEmail(userDto.Email);
+        User? user = await _context.Users
+            .Include(u => u.RefreshTokens)
+            .IgnoreQueryFilters()
+            .WithRoleByEmailAsync(userDto.Email);
         if (user == null)
         {
             string youtubeId = await _googleAuthProvider.GetYoutubeIdByName(userDto.Name);

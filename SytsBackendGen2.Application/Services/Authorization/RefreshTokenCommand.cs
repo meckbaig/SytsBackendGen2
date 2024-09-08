@@ -46,9 +46,9 @@ public class RefreshTokenCommandHandler : IRequestHandler<RefreshTokenCommand, R
     {
         request.refreshToken = request.refreshToken.Replace(' ', '+');
 
-        User user = _context.Users
+        User user = await _context.Users
             .Include(u => u.RefreshTokens.Where(t => t.Token.Equals(request.refreshToken)))
-            .WithRoleById(request.userId);
+            .WithRoleByIdAsync(request.userId);
 
         await ValidateUserAndToken(user, request.userId, request);
 

@@ -18,7 +18,7 @@ public record AccessDto : IBaseDto
     {
         public Mapping()
         {
-            CreateMap<Access, AccessDto>();
+            CreateMap<Access, AccessDto>().ReverseMap();
         }
     }
 }

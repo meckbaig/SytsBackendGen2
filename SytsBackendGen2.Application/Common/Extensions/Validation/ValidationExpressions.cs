@@ -9,8 +9,8 @@ internal static class ValidationExpressions
         <T>(this IRuleBuilder<T, int> ruleBuilder, IAppDbContext context)
     {
         return ruleBuilder.Must((q, p) => HaveValidUserId(p, context))
-            .WithMessage($"User Id is not valid")
-            .WithErrorCode("NotValidUserId");
+            .WithMessage($"User with provided id doesn't exist.")
+            .WithErrorCode("UserDoesNotExist");
     }
 
     private static bool HaveValidUserId(int userId, IAppDbContext context)
@@ -19,12 +19,13 @@ internal static class ValidationExpressions
             return context.Users.Any(u => u.Id == userId);
         return false;
     }
+
     public static IRuleBuilderOptions<T, Guid> MustHaveValidFolderGuid
         <T>(this IRuleBuilder<T, Guid> ruleBuilder, IAppDbContext context)
     {
         return ruleBuilder.Must((q, p) => HaveValidFolderGuid(p, context))
-            .WithMessage($"Folder guid is not valid")
-            .WithErrorCode("NotValidFolderGuid");
+            .WithMessage($"Folder with provided guid doesn't exist.")
+            .WithErrorCode("FolderDoesNotExist");
     }
 
     private static bool HaveValidFolderGuid(Guid folderGuid, IAppDbContext context)

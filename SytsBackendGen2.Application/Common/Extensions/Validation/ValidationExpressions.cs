@@ -17,7 +17,7 @@ internal static class ValidationExpressions
     {
         if (userId > 0)
             return context.Users.Any(u => u.Id == userId);
-        return false;
+        return true;
     }
 
     public static IRuleBuilderOptions<T, Guid> MustHaveValidFolderGuid

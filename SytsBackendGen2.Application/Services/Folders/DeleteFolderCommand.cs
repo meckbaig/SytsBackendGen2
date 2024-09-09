@@ -54,7 +54,7 @@ public class DeleteFolderCommandHandler : IRequestHandler<DeleteFolderCommand, D
         }
 
         _context.Folders.Remove(folder);
-        await _context.SaveChangesAsync();
+        await _context.SaveChangesAsync(cancellationToken);
 
         return new DeleteFolderResponse();
     }

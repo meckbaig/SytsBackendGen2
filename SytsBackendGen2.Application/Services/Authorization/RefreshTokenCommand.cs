@@ -46,11 +46,11 @@ public class RefreshTokenCommandHandler : IRequestHandler<RefreshTokenCommand, R
     {
         request.refreshToken = request.refreshToken.Replace(' ', '+');
 
-        User user = await _context.Users
+        User? user = await _context.Users
             .Include(u => u.RefreshTokens.Where(t => t.Token.Equals(request.refreshToken)))
-            .WithRoleByIdAsync(request.userId);
+            .WithRoleByIdAsync(request.userId, cancellationToken);
 
-        await ValidateUserAndToken(user, request.userId, request);
+        await ValidateUserAndToken(user, request.userId, request, cancellationToken);
 
         string jwt = _jwtProvider.GenerateToken(user);
         string refreshToken = _jwtProvider.GenerateRefreshToken(user, request.refreshToken);
@@ -60,7 +60,11 @@ public class RefreshTokenCommandHandler : IRequestHandler<RefreshTokenCommand, R
         return new RefreshTokenResponse { Token = jwt, RefreshToken = refreshToken };
     }
 
-    private async Task ValidateUserAndToken(User user, int userId, RefreshTokenCommand request)
+    private async Task ValidateUserAndToken(
+        User user,
+        int userId,
+        RefreshTokenCommand request,
+        CancellationToken cancellationToken)
     {
         if (user == null)
         {
@@ -72,7 +76,7 @@ public class RefreshTokenCommandHandler : IRequestHandler<RefreshTokenCommand, R
         if (token == null || token.Invalidated)
         {
             if (token?.Invalidated ?? false)
-                await TryInvalidateAllUserRefreshTokensAsync(userId);
+                await TryInvalidateAllUserRefreshTokensAsync(userId, cancellationToken);
             await _context.SaveChangesAsync();
 
             throw new Common.Exceptions.ValidationException(
@@ -87,13 +91,13 @@ public class RefreshTokenCommandHandler : IRequestHandler<RefreshTokenCommand, R
         }
     }
 
-    private async Task<bool> TryInvalidateAllUserRefreshTokensAsync(int userId)
+    private async Task<bool> TryInvalidateAllUserRefreshTokensAsync(int userId, CancellationToken cancellationToken)
     {
         try
         {
             await _context.RefreshTokens
                 .Where(t => t.UserId == userId)
-                .ExecuteUpdateAsync(x => x.SetProperty(t => t.Invalidated, true));
+                .ExecuteUpdateAsync(x => x.SetProperty(t => t.Invalidated, true), cancellationToken);
             return true;
         }
         catch (Exception)

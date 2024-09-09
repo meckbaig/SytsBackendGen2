@@ -46,8 +46,8 @@ public class CreateFolderCommandHandler : IRequestHandler<CreateFolderCommand, C
     {
         Folder folder = new(request.userId, request.name);
         _context.Folders.Add(folder);
-        await _context.SaveChangesAsync();
-        folder = await _context.Folders.WithAccessByGuidAsync(folder.Guid);
+        await _context.SaveChangesAsync(cancellationToken);
+        folder = await _context.Folders.WithAccessByGuidAsync(folder.Guid, cancellationToken);
 
         return new CreateFolderResponse() { Folder = _mapper.Map<FolderDto>(folder) };
     }

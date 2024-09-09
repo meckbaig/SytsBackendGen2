@@ -92,7 +92,7 @@ public class AuthorizeUserCommandHandler : IRequestHandler<AuthorizeUserCommand,
             user = new(youtubeId, userDto.Email);
             await _context.Users.AddAsync(user, cancellationToken);
             await _context.SaveChangesAsync(cancellationToken);
-            user.Role = await _context.Roles.FirstOrDefaultAsync(r => r.Id == user.RoleId);
+            user.Role = await _context.Roles.FirstOrDefaultAsync(r => r.Id == user.RoleId, cancellationToken);
         }
         if (user.Deleted)
         {

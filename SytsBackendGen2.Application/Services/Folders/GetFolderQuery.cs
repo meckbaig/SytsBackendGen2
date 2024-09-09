@@ -9,6 +9,7 @@ using SytsBackendGen2.Application.Common.Exceptions;
 using SytsBackendGen2.Application.Common.Interfaces;
 using SytsBackendGen2.Application.DTOs.Folders;
 using SytsBackendGen2.Application.Extensions.Validation;
+using SytsBackendGen2.Domain.Entities;
 using SytsBackendGen2.Domain.Enums;
 
 namespace SytsBackendGen2.Application.Services.Folders;
@@ -56,20 +57,7 @@ public class GetFolderQueryHandler : IRequestHandler<GetFolderQuery, GetFolderRe
         var folder = await _context.Folders
             .Include(f => f.Access)
             .FirstOrDefaultAsync(f => f.Guid == request.guid);
-
-        if (folder == null)
-        {
-            throw new Common.Exceptions.ValidationException(
-                nameof(request.guid),
-                [new ErrorItem($"Folder with guid '{request.guid}' doesn't exist.",
-                    ValidationErrorCode.PropertyDoesNotExistValidator)]);
-        }
-        if (folder.Access == AccessEnum.Private && folder.UserId != request.userId)
-        {
-            throw new ForbiddenAccessException(
-                "JWT token",
-                [new ErrorItem("User doesn't have access to this folder.", ForbiddenAccessErrorCode.ForbiddenAccessValidator)]);
-        }
+        ValidateFolder(request, folder);
 
         FolderDto folderDto = _mapper.Map<FolderDto>(folder);
         List<VideoDto> videos = null;
@@ -84,7 +72,7 @@ public class GetFolderQueryHandler : IRequestHandler<GetFolderQuery, GetFolderRe
             {
                 folder.LastVideoId = firstVideoId;
                 folder.LastVideosAccess = folderDto.LastVideosAccess = DateTime.UtcNow;
-                _context.SaveChanges();
+                await _context.SaveChangesAsync(cancellationToken);
             }
         }
 
@@ -93,5 +81,22 @@ public class GetFolderQueryHandler : IRequestHandler<GetFolderQuery, GetFolderRe
             Folder = folderDto,
             Videos = videos
         };
+    }
+
+    private static void ValidateFolder(GetFolderQuery request, Folder? folder)
+    {
+        if (folder == null)
+        {
+            throw new Common.Exceptions.ValidationException(
+                nameof(request.guid),
+                [new ErrorItem($"Folder with guid '{request.guid}' doesn't exist.",
+                    ValidationErrorCode.PropertyDoesNotExistValidator)]);
+        }
+        if (folder.Access == AccessEnum.Private && folder.UserId != request.userId)
+        {
+            throw new ForbiddenAccessException(
+                "JWT token",
+                [new ErrorItem("User doesn't have access to this folder.", ForbiddenAccessErrorCode.ForbiddenAccessValidator)]);
+        }
     }
 }

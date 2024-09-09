@@ -66,7 +66,7 @@ public class UpdateFolderCommandHandler : IRequestHandler<UpdateFolderCommand, U
         _mapper.Map(request.folder, folder);
         folder.LastChannelsUpdate = DateTime.UtcNow;
         _context.Folders.Update(folder);
-        await _context.SaveChangesAsync();
+        await _context.SaveChangesAsync(cancellationToken);
 
         return new UpdateFolderResponse() { Folder = _mapper.Map<FolderDto>(folder) };
     }

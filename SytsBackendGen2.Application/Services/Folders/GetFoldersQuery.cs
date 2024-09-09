@@ -48,9 +48,9 @@ public class GetFoldersQueryHandler : IRequestHandler<GetFoldersQuery, GetFolder
         List<Folder> personalFolders = new();
         if (request.loggedIn)
         {
-            personalFolders = await GetPrivateFolders(request.userId);
+            personalFolders = await GetPrivateFolders(request.userId, cancellationToken);
         }
-        var publicFolders = await GetPublicFolders(request.userId);
+        var publicFolders = await GetPublicFolders(request.userId, cancellationToken);
 
         return new()
         {
@@ -59,21 +59,21 @@ public class GetFoldersQueryHandler : IRequestHandler<GetFoldersQuery, GetFolder
         };
     }
 
-    private async Task<List<Folder>> GetPrivateFolders(int userId)
+    private async Task<List<Folder>> GetPrivateFolders(int userId, CancellationToken cancellationToken)
     {
         return await _context.Folders
             .Include(f => f.Access)
             .Where(f => f.UserId == userId)
             .OrderByDescending(f => f.LastChannelsUpdate)
-            .ToListAsync();
+            .ToListAsync(cancellationToken);
     }
 
-    private async Task<List<Folder>> GetPublicFolders(int userId)
+    private async Task<List<Folder>> GetPublicFolders(int userId, CancellationToken cancellationToken)
     {
         return await _context.Folders
             .Include(f => f.Access)
             .Where(f => (AccessEnum)f.AccessId == AccessEnum.Public && f.UserId != userId)
             .Take(50)
-            .ToListAsync();
+            .ToListAsync(cancellationToken);
     }
 }

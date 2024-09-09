@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using SytsBackendGen2.Application.Services.Users;
 using SytsBackendGen2.Domain.Enums;
+using SytsBackendGen2.Infrastructure.Authentification.Jwt;
 using SytsBackendGen2.Infrastructure.Authentification.Permissions;
 
 namespace SytsBackendGen2.Web.Controllers.V1;
@@ -20,12 +21,11 @@ public class UsersController : ControllerBase
     [HttpPost]
     [HasPermission(Permission.PrivateDataEditor)]
     [Route("UpdateYoutubeId")]
-    public async Task<ActionResult<UpdateYoutubeIdResponse>> UpdateYoutubeId([FromBody] UpdateYoutubeId body)
+    public async Task<ActionResult<UpdateYoutubeIdResponse>> UpdateYoutubeId([FromBody] UpdateYoutubeIdCommand command)
     {
-        var command = new UpdateYoutubeIdCommand { youtubeId = body.youtubeId, principal = User };
+        if (int.TryParse(User.Claims.First(c => c.Type == CustomClaim.UserId).Value, out int userId))
+            command.SetUserId(userId);
         var result = await _mediator.Send(command);
         return result.ToJsonResponse();
     }
 }
-
-public sealed record UpdateYoutubeId(string youtubeId);

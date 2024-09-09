@@ -1,6 +1,4 @@
 using Microsoft.AspNetCore.Diagnostics;
-using Microsoft.AspNetCore.JsonPatch.Exceptions;
-using SytsBackendGen2.Application.Common.BaseRequests.JsonPatchCommand;
 using SytsBackendGen2.Application.Common.Exceptions;
 using SytsBackendGen2.Web.Structure.CustomProblemDetails;
 
@@ -29,10 +27,10 @@ public class CustomExceptionHandler : IExceptionHandler
     }
 
     /// <summary>
-    /// Handle the exception according to registred types
+    /// Handle the exception according to registered types
     /// </summary>
     /// <param name="httpContext">Request context</param>
-    /// <param name="ex">Error to hendle</param>
+    /// <param name="ex">Error to handle</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns></returns>
     public async ValueTask<bool> TryHandleAsync(HttpContext httpContext, Exception ex,
@@ -46,6 +44,33 @@ public class CustomExceptionHandler : IExceptionHandler
             return true;
         }
 
+        if (await CheckForPostgresException(httpContext, ex))
+            await HandlePostgresException(httpContext, ex);
+        else
+            await HandleUnhandledException(httpContext, ex);
+
+        return false;
+    }
+
+    private async Task<bool> CheckForPostgresException(HttpContext httpContext, Exception ex)
+    {
+        bool isPostgresException = false;
+        Exception? exception = ex;
+        do
+        {
+            Type type = exception.GetType();
+            if (exception is Npgsql.PostgresException || exception is Npgsql.NpgsqlException)
+            {
+                isPostgresException = true;
+                break;
+            }
+            exception = exception.InnerException;
+        } while (exception is not null);
+        return isPostgresException;
+    }
+
+    private async Task HandleUnhandledException(HttpContext httpContext, Exception ex)
+    {
         httpContext.Response.StatusCode = StatusCodes.Status500InternalServerError;
 
         ErrorItem error = new(ex.Message, "UnhandledException");
@@ -59,7 +84,23 @@ public class CustomExceptionHandler : IExceptionHandler
                 { "Undefined", [error] }
             }
         });
-        return false;
+    }
+
+    private async Task HandlePostgresException(HttpContext httpContext, Exception ex)
+    {
+        httpContext.Response.StatusCode = StatusCodes.Status500InternalServerError;
+
+        ErrorItem error = new(ex.Message, "DatabaseException");
+        await httpContext.Response.WriteAsJsonAsync(new
+        {
+            Status = StatusCodes.Status500InternalServerError,
+            Type = "https://datatracker.ietf.org/doc/html/rfc9110#section-15.6.1",
+            Title = "Database exception occurred.",
+            Errors = new Dictionary<string, ErrorItem[]>
+            {
+                { "Undefined", [error] }
+            }
+        });
     }
 
     private async Task HandleValidationException(HttpContext httpContext, Exception ex)
@@ -109,7 +150,7 @@ public class CustomExceptionHandler : IExceptionHandler
 
         if (ex is ForbiddenAccessException exception)
         {
-            await httpContext.Response.WriteAsJsonAsync(new 
+            await httpContext.Response.WriteAsJsonAsync(new
             {
                 Status = StatusCodes.Status403Forbidden,
                 Title = "Access denied",

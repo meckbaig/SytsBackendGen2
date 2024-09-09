@@ -28,4 +28,15 @@ public class UsersController : ControllerBase
         var result = await _mediator.Send(command);
         return result.ToJsonResponse();
     }
+
+    [HttpPost]
+    [HasPermission(Permission.PrivateDataEditor)]
+    [Route("UpdateSubChannels")]
+    public async Task<ActionResult<UpdateSubChannelsResponse>> UpdateSubChannels([FromBody] UpdateSubChannelsCommand command)
+    {
+        if (int.TryParse(User.Claims.First(c => c.Type == CustomClaim.UserId).Value, out int userId))
+            command.SetUserId(userId);
+        var result = await _mediator.Send(command);
+        return result.ToJsonResponse();
+    }
 }

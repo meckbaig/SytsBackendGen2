@@ -326,7 +326,7 @@ public class VideoFetcher : IVideoFetcher
     /// Получение готовых к выдаче видео
     /// </summary>
     /// <returns>Список видео, отсортированных по дате</returns>
-    public List<dynamic> ToList(out string firstVideoId, string lastVideoId = "")
+    public List<dynamic> ToList(string lastVideoId = "")
     {
         QuickSort();
         foreach (dynamic video in _readyVideosList)
@@ -335,10 +335,6 @@ public class VideoFetcher : IVideoFetcher
                 break;
             video.isNew = true;
         }
-        if (_readyVideosList.Count > 0)
-            firstVideoId = _readyVideosList?[0]?.id;
-        else
-            firstVideoId = "";
         return _readyVideosList;
     }
 

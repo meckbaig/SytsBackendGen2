@@ -7,7 +7,7 @@ namespace SytsBackendGen2.Application.Common.BaseRequests;
 public record BaseRequest<TResponse> : IRequest<TResponse> where TResponse : BaseResponse
 {
     private string? _key = null;
-    public string GetKey()
+    public virtual string GetKey()
     {
         if (_key is null)
         {

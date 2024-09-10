@@ -2,10 +2,12 @@
 using FluentValidation;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Distributed;
 using SytsBackendGen2.Application.Common.Attributes;
 using SytsBackendGen2.Application.Common.BaseRequests;
 using SytsBackendGen2.Application.Common.BaseRequests.AuthentificatedRequest;
 using SytsBackendGen2.Application.Common.Exceptions;
+using SytsBackendGen2.Application.Common.Extensions.Caching;
 using SytsBackendGen2.Application.Common.Interfaces;
 using SytsBackendGen2.Application.DTOs.Folders;
 using SytsBackendGen2.Application.Extensions.Validation;
@@ -16,18 +18,21 @@ namespace SytsBackendGen2.Application.Services.Folders;
 
 public record GetFolderQuery : BaseAuthentificatedRequest<GetFolderResponse>
 {
-    public Guid guid { get; set; }
-    public bool info { get; set; }
+    internal Guid guid { get; set; }
+    public bool info { get; set; } = false;
+    public bool forceRefresh { get; set; } = false;
     internal override bool loggedIn { get; set; }
     internal override int userId { get; set; }
+
+    public void SetFolderGuid(Guid guid) => this.guid = guid;
+    public override string GetKey() => guid.ToString();
 }
 
 public class GetFolderResponse : BaseResponse
 {
-    public required FolderDto Folder { get; set; }
-
     [IgnoreIfNull]
     public List<VideoDto>? Videos { get; set; }
+    public required FolderDto Folder { get; set; }
 }
 
 public class GetFolderQueryValidator : AbstractValidator<GetFolderQuery>
@@ -44,12 +49,18 @@ public class GetFolderQueryHandler : IRequestHandler<GetFolderQuery, GetFolderRe
     private readonly IAppDbContext _context;
     private readonly IMapper _mapper;
     private readonly IVideoFetcher _videoFetcher;
+    private readonly IDistributedCache _cache;
 
-    public GetFolderQueryHandler(IAppDbContext context, IMapper mapper, IVideoFetcher videoFetcher)
+    public GetFolderQueryHandler(
+        IAppDbContext context,
+        IMapper mapper,
+        IVideoFetcher videoFetcher,
+        IDistributedCache cache)
     {
         _context = context;
         _mapper = mapper;
         _videoFetcher = videoFetcher;
+        _cache = cache;
     }
 
     public async Task<GetFolderResponse> Handle(GetFolderQuery request, CancellationToken cancellationToken)
@@ -64,13 +75,23 @@ public class GetFolderQueryHandler : IRequestHandler<GetFolderQuery, GetFolderRe
 
         if (!request.info)
         {
-            await _videoFetcher.Fetch(folderDto.SubChannels, folderDto.YoutubeFolders, folderDto.ChannelsCount);
-            var dynamicVideosList = _videoFetcher.ToList(out string firstVideoId, folder.LastVideoId);
-            videos = _mapper.Map<List<VideoDto>>(dynamicVideosList);
-
-            if (firstVideoId != null)
+            Task<List<dynamic>> fetchTask = Task.Run(async () =>
             {
-                folder.LastVideoId = firstVideoId;
+                await _videoFetcher.Fetch(folderDto.SubChannels, folderDto.YoutubeFolders, folderDto.ChannelsCount);
+                return _videoFetcher.ToList(folder.LastVideoId);
+            });
+
+            var fetchResult = await _cache.GetOrCreateAsync(
+                request.GetKey(),
+                () => fetchTask,
+                _mapper.Map<List<VideoDto>>,
+                cancellationToken, 
+                request.forceRefresh);
+            videos = fetchResult.Data;
+
+            if (videos?.FirstOrDefault()?.Id != null && !fetchResult.FetchedFromCache)
+            {
+                folder.LastVideoId = videos!.FirstOrDefault()!.Id;
                 folder.LastVideosAccess = folderDto.LastVideosAccess = DateTime.UtcNow;
                 await _context.SaveChangesAsync(cancellationToken);
             }
@@ -78,8 +99,8 @@ public class GetFolderQueryHandler : IRequestHandler<GetFolderQuery, GetFolderRe
 
         return new GetFolderResponse
         {
-            Folder = folderDto,
-            Videos = videos
+            Videos = videos,
+            Folder = folderDto
         };
     }
 

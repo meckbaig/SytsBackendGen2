@@ -72,6 +72,7 @@ public class UpdateFolderCommandHandler : IRequestHandler<UpdateFolderCommand, U
         if (previousSubChannels != folder.SubChannelsJson)
         {
             folder.LastChannelsUpdate = DateTime.UtcNow;
+            folder.LastVideoId = null;
             _cache.RemoveFromCache(folder.Guid.ToString());
         }
         _context.Folders.Update(folder);

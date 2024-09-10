@@ -2,9 +2,11 @@
 using FluentValidation;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Distributed;
 using SytsBackendGen2.Application.Common.BaseRequests;
 using SytsBackendGen2.Application.Common.BaseRequests.AuthentificatedRequest;
 using SytsBackendGen2.Application.Common.Exceptions;
+using SytsBackendGen2.Application.Common.Extensions.Caching;
 using SytsBackendGen2.Application.Common.Interfaces;
 using SytsBackendGen2.Application.DTOs.Folders;
 using SytsBackendGen2.Application.Extensions.Validation;
@@ -45,11 +47,13 @@ public class UpdateFolderCommandHandler : IRequestHandler<UpdateFolderCommand, U
 {
     private readonly IAppDbContext _context;
     private readonly IMapper _mapper;
+    private readonly IDistributedCache _cache;
 
-    public UpdateFolderCommandHandler(IAppDbContext context, IMapper mapper)
+    public UpdateFolderCommandHandler(IAppDbContext context, IMapper mapper, IDistributedCache cache)
     {
         _context = context;
         _mapper = mapper;
+        _cache = cache;
     }
 
     public async Task<UpdateFolderResponse> Handle(UpdateFolderCommand request, CancellationToken cancellationToken)
@@ -62,9 +66,14 @@ public class UpdateFolderCommandHandler : IRequestHandler<UpdateFolderCommand, U
                 [new ErrorItem($"User '{request.userId}' is not owner of folder '{request.guid}'.",
                     ForbiddenAccessErrorCode.ForbiddenAccessValidator)]);
         }
+        var previousSubChannels = folder.SubChannelsJson;
 
         _mapper.Map(request.folder, folder);
-        folder.LastChannelsUpdate = DateTime.UtcNow;
+        if (previousSubChannels != folder.SubChannelsJson)
+        {
+            folder.LastChannelsUpdate = DateTime.UtcNow;
+            _cache.RemoveFromCache(folder.Guid.ToString());
+        }
         _context.Folders.Update(folder);
         await _context.SaveChangesAsync(cancellationToken);
 

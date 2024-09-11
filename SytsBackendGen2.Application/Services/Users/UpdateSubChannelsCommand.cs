@@ -2,10 +2,13 @@
 using FluentValidation;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Newtonsoft.Json.Serialization;
 using SytsBackendGen2.Application.Common.BaseRequests;
 using SytsBackendGen2.Application.Common.BaseRequests.AuthentificatedRequest;
 using SytsBackendGen2.Application.Common.Interfaces;
+using SytsBackendGen2.Application.DTOs.Folders;
 using SytsBackendGen2.Application.Extensions.Validation;
 using SytsBackendGen2.Domain.Entities.Authentification;
 
@@ -13,7 +16,7 @@ namespace SytsBackendGen2.Application.Services.Users;
 
 public record UpdateSubChannelsCommand : BaseAuthentificatedRequest<UpdateSubChannelsResponse>
 {
-    public required JArray channels { get; set; }
+    public required List<SubChannelDto> channels { get; set; }
     internal override int userId { get; set; }
 }
 
@@ -45,7 +48,11 @@ public class UpdateSubChannelsCommandHandler : IRequestHandler<UpdateSubChannels
     {
         User user = (await _context.Users.FirstOrDefaultAsync(u => u.Id == request.userId, cancellationToken))!;
 
-        user.SetSubChannelsJson(request.channels.ToString());
+        user.SetSubChannelsJson(
+            JsonConvert.SerializeObject(
+                request.channels,
+                new JsonSerializerSettings { ContractResolver = new CamelCasePropertyNamesContractResolver() }
+            ));
         await _context.SaveChangesAsync(cancellationToken);
 
         return new UpdateSubChannelsResponse() { LastChannelsUpdate = (DateTimeOffset)user.LastChannelsUpdate!};

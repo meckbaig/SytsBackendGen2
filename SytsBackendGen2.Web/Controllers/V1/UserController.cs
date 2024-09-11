@@ -32,8 +32,21 @@ public class UsersController : ControllerBase
     [HttpPost]
     [HasPermission(Permission.PrivateDataEditor)]
     [Route("UpdateSubChannels")]
-    public async Task<ActionResult<UpdateSubChannelsResponse>> UpdateSubChannels([FromBody] UpdateSubChannelsCommand command)
+    public async Task<ActionResult<UpdateSubChannelsResponse>> UpdateSubChannelsV1([FromBody] UpdateSubChannelsCommand command)
     {
+        if (int.TryParse(User.Claims.First(c => c.Type == CustomClaim.UserId).Value, out int userId))
+            command.SetUserId(userId);
+        var result = await _mediator.Send(command);
+        return result.ToJsonResponse();
+    }
+
+    [HttpPost]
+    [HasPermission(Permission.PrivateDataEditor)]
+    [Route("UpdateSubChannels")]
+    [ApiVersion("1.1")]
+    public async Task<ActionResult<UpdateSubChannelsV1_1Response>> UpdateSubChannelsV1_1()
+    {
+        UpdateSubChannelsV1_1Command command = new();
         if (int.TryParse(User.Claims.First(c => c.Type == CustomClaim.UserId).Value, out int userId))
             command.SetUserId(userId);
         var result = await _mediator.Send(command);

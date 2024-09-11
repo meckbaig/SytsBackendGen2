@@ -49,7 +49,7 @@ public class GoogleAuthProvider : IGoogleAuthProvider
         return channelsArray.items[0].id.channelId;
     }
 
-    public async Task<(List<SubChannelDto>, int, string?)> GetSubChannels(string channelId, string? nextPageToken = null)
+    public async Task<(List<SubChannelDto>, string?)> GetSubChannels(string channelId, string? nextPageToken = null)
     {
         _httpClient.DefaultRequestHeaders.Clear();
         var url = new UriBuilder("https://youtube.googleapis.com/youtube/v3/subscriptions")
@@ -72,10 +72,10 @@ public class GoogleAuthProvider : IGoogleAuthProvider
                 ThumbnailUrl = item.snippet.thumbnails["default"].url
             });
         }
-        int totalResults = int.Parse(responseData["pageInfo"]["totalResults"].ToString());
+        //int totalResults = int.Parse(responseData["pageInfo"]["totalResults"].ToString());
         nextPageToken = responseData["nextPageToken"] ?? null;
 
-        return (subChannelsResponse, totalResults, nextPageToken);
+        return (subChannelsResponse, nextPageToken);
     }
 
     private string BuildGetSubChannelsQueryString(string channelId, string? nextPageToken = null)

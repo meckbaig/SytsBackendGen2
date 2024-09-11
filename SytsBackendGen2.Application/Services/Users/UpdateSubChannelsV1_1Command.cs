@@ -34,23 +34,22 @@ public class UpdateSubChannelsV1_1CommandValidator : AbstractValidator<UpdateSub
 public class UpdateSubChannelsV1_1CommandHandler : IRequestHandler<UpdateSubChannelsV1_1Command, UpdateSubChannelsV1_1Response>
 {
     private readonly IAppDbContext _context;
-    private readonly IMapper _mapper;
     private readonly IMediator _mediator;
     private readonly IGoogleAuthProvider _googleAuthProvider;
 
     public UpdateSubChannelsV1_1CommandHandler(
         IAppDbContext context,
-        IMapper mapper,
         IMediator mediator,
         IGoogleAuthProvider googleAuthProvider)
     {
         _context = context;
-        _mapper = mapper;
         _mediator = mediator;
         _googleAuthProvider = googleAuthProvider;
     }
 
-    public async Task<UpdateSubChannelsV1_1Response> Handle(UpdateSubChannelsV1_1Command request, CancellationToken cancellationToken)
+    public async Task<UpdateSubChannelsV1_1Response> Handle(
+        UpdateSubChannelsV1_1Command request,
+        CancellationToken cancellationToken)
     {
         User user = _context.Users.FirstOrDefault(u => u.Id == request.userId)!;
         HashSet<SubChannelDto> subChannels = new();
@@ -71,9 +70,12 @@ public class UpdateSubChannelsV1_1CommandHandler : IRequestHandler<UpdateSubChan
         };
     }
 
-    private async Task<HashSet<SubChannelDto>> GetSubChannels(string channelId, HashSet<SubChannelDto> subChannels, string? nextPageToken = null)
+    private async Task<HashSet<SubChannelDto>> GetSubChannels(
+        string channelId,
+        HashSet<SubChannelDto> subChannels,
+        string? nextPageToken = null)
     {
-        (List<SubChannelDto> subChannelsResponse, int totalResults, nextPageToken)
+        (List<SubChannelDto> subChannelsResponse, nextPageToken)
             = await _googleAuthProvider.GetSubChannels(channelId, nextPageToken);
 
         subChannels = [..subChannels, ..subChannelsResponse];

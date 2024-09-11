@@ -13,5 +13,5 @@ public interface IGoogleAuthProvider
 {
     Task<UserPreviewDto?> AuthorizeAsync(string accessToken);
     Task<string> GetYoutubeIdByName(string username);
-    Task<(List<SubChannelDto>, int, string?)> GetSubChannels(string channelId, string? nextPageToken = null);
+    Task<(List<SubChannelDto>, string?)> GetSubChannels(string channelId, string? nextPageToken = null);
 }

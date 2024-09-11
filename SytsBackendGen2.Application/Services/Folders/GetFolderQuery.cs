@@ -75,15 +75,9 @@ public class GetFolderQueryHandler : IRequestHandler<GetFolderQuery, GetFolderRe
 
         if (!request.info)
         {
-            Task<List<dynamic>> fetchTask = Task.Run(async () =>
-            {
-                await _videoFetcher.Fetch(folderDto.SubChannels, folderDto.YoutubeFolders, folderDto.ChannelsCount);
-                return _videoFetcher.ToList(folder.LastVideoId);
-            });
-
             var fetchResult = await _cache.GetOrCreateAsync(
                 request.GetKey(),
-                () => fetchTask,
+                () => VideosFetchTask(folder, folderDto),
                 _mapper.Map<List<VideoDto>>,
                 cancellationToken, 
                 request.forceRefresh);
@@ -102,6 +96,12 @@ public class GetFolderQueryHandler : IRequestHandler<GetFolderQuery, GetFolderRe
             Videos = videos,
             Folder = folderDto
         };
+    }
+
+    private async Task<List<dynamic>> VideosFetchTask(Folder? folder, FolderDto folderDto)
+    {
+        await _videoFetcher.Fetch(folderDto.SubChannels, folderDto.YoutubeFolders, folderDto.ChannelsCount);
+        return _videoFetcher.ToList(folder.LastVideoId);
     }
 
     private static void ValidateFolder(GetFolderQuery request, Folder? folder)

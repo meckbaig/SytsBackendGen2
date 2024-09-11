@@ -1,28 +1,34 @@
-using FluentValidation.Results;
-using SytsBackendGen2.Application.Common.Exceptions;
 using System.Text.Json.Serialization;
-using SytsBackendGen2.Application.Common.Extensions.StringExtensions;
+using SytsBackendGen2.Application.Common.Exceptions;
 
 namespace SytsBackendGen2.Web.Structure.CustomProblemDetails
 {
     /// <summary>
-    /// Custom implementaticn of <see cref="T:Microsoft.AspNetCore.Mvc.ValidationProblemDetails" />.
+    /// Represents a custom implementation of <see cref="ValidationProblemDetails"/> for handling access problems.
     /// </summary>
     public class CustomAccessProblemDetails : ValidationProblemDetails
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="CustomAccessProblemDetails"/> class.
+        /// </summary>
         public CustomAccessProblemDetails() { }
 
         /// <summary>
-        /// Initializes a new instance of <see cref="CustomAccessProblemDetails" />.
+        /// Initializes a new instance of the <see cref="CustomAccessProblemDetails"/> class with the specified <see cref="ForbiddenAccessException"/>.
         /// </summary>
-        /// <param name="errors">Validation errors</param>
-        public CustomAccessProblemDetails(IDictionary<string, ErrorItem[]> errors)
+        /// <param name="exception">The <see cref="ForbiddenAccessException"/> to initialize the instance with.</param>
+        public CustomAccessProblemDetails(ForbiddenAccessException exception)
         {
-            Errors = errors.ToDictionary(
-                kvp => string.Join(".", kvp.Key.Split('.').Select(x => x.ToCamelCase())), 
-                kvp => kvp.Value);
+            Title = exception.Message;
+            Errors = new Dictionary<string, ErrorItem[]>() { { exception.Errors.Key, exception.Errors.Value } };
         }
 
+        /// <summary>
+        /// Gets or sets the errors dictionary for the problem.
+        /// </summary>
+        /// <remarks>
+        /// This property is overridden to provide a new type for the errors dictionary.
+        /// </remarks>
         [JsonPropertyName("errors")]
         public new IDictionary<string, ErrorItem[]> Errors { get; }
     }

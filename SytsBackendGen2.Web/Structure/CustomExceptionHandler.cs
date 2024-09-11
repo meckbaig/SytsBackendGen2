@@ -108,7 +108,7 @@ public class CustomExceptionHandler : IExceptionHandler
         httpContext.Response.StatusCode = StatusCodes.Status400BadRequest;
         if (ex is ValidationException exception)
         {
-            await httpContext.Response.WriteAsJsonAsync(new CustomValidationProblemDetails(exception.Errors)
+            await httpContext.Response.WriteAsJsonAsync(new CustomValidationProblemDetails(exception)
             {
                 Status = httpContext.Response.StatusCode,
                 Type = "https://tools.ietf.org/html/rfc9110#section-15.5.1"
@@ -150,15 +150,10 @@ public class CustomExceptionHandler : IExceptionHandler
 
         if (ex is ForbiddenAccessException exception)
         {
-            await httpContext.Response.WriteAsJsonAsync(new
+            await httpContext.Response.WriteAsJsonAsync(new CustomAccessProblemDetails(exception)
             {
                 Status = StatusCodes.Status403Forbidden,
-                Title = "Access denied",
                 Type = "https://tools.ietf.org/html/rfc7231#section-6.5.3",
-                Errors = new Dictionary<string, ErrorItem[]>
-                {
-
-                }
             });
         }
     }

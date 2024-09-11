@@ -19,7 +19,7 @@ namespace SytsBackendGen2.Application.Services.Folders;
 public record GetFolderQuery : BaseAuthentificatedRequest<GetFolderResponse>
 {
     internal Guid guid { get; set; }
-    public bool info { get; set; } = false;
+    public bool toEdit { get; set; } = false;
     public bool forceRefresh { get; set; } = false;
     internal override bool loggedIn { get; set; }
     internal override int userId { get; set; }
@@ -73,7 +73,7 @@ public class GetFolderQueryHandler : IRequestHandler<GetFolderQuery, GetFolderRe
         FolderDto folderDto = _mapper.Map<FolderDto>(folder);
         List<VideoDto> videos = null;
 
-        if (!request.info)
+        if (!request.toEdit)
         {
             var fetchResult = await _cache.GetOrCreateAsync(
                 request.GetKey(),
@@ -118,6 +118,12 @@ public class GetFolderQueryHandler : IRequestHandler<GetFolderQuery, GetFolderRe
             throw new ForbiddenAccessException(
                 "JWT token",
                 [new ErrorItem("User doesn't have access to this folder.", ForbiddenAccessErrorCode.ForbiddenAccessValidator)]);
+        }
+        if (request.toEdit && folder.UserId != request.userId)
+        {
+            throw new ForbiddenAccessException(
+                "JWT token",
+                [new ErrorItem("User doesn't have access to edit this folder.", ForbiddenAccessErrorCode.ForbiddenAccessValidator)]);
         }
     }
 }

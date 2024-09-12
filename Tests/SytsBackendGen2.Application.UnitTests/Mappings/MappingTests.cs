@@ -1,10 +1,13 @@
+using AutoMapper;
+using NUnit.Framework;
+using System.Dynamic;
 using System.Reflection;
 using System.Runtime.Serialization;
-using AutoMapper;
 using SytsBackendGen2.Application.Common.Interfaces;
-using SytsBackendGen2.Application.DTOs.Kontragents;
+using SytsBackendGen2.Application.DTOs.Folders;
+using SytsBackendGen2.Application.DTOs.Users;
 using SytsBackendGen2.Domain.Entities;
-using NUnit.Framework;
+using SytsBackendGen2.Domain.Entities.Authentification;
 
 namespace Application.UnitTests.Mappings;
 
@@ -15,7 +18,7 @@ public class MappingTests
 
     public MappingTests()
     {
-        _configuration = new MapperConfiguration(config => 
+        _configuration = new MapperConfiguration(config =>
             config.AddMaps(Assembly.GetAssembly(typeof(IAppDbContext))));
 
         _mapper = _configuration.CreateMapper();
@@ -29,7 +32,12 @@ public class MappingTests
 
     /// TODO: Add here more DTOs
     [Test]
-    [TestCase(typeof(Kontragent), typeof(KonragentPreviewDto))]
+    [TestCase(typeof(Access), typeof(AccessDto))]
+    [TestCase(typeof(Folder), typeof(FolderDto))]
+    [TestCase(typeof(FolderEditDto), typeof(Folder))]
+    [TestCase(typeof(ExpandoObject), typeof(VideoDto))]
+    [TestCase(typeof(ExpandoObject), typeof(SubChannelDto))]
+    [TestCase(typeof(User), typeof(UserPreviewDto))]
     public void ShouldSupportMappingFromSourceToDestination(Type source, Type destination)
     {
         var instance = GetInstanceOf(source);

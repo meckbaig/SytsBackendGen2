@@ -37,7 +37,7 @@
   </ItemGroup>
   
   <ItemGroup>
-	<InternalsVisibleTo Include="SytsBackendGen2.Application.IntegrationTests" />
+	<InternalsVisibleTo Include="SytsBackendGen2.Application.SystemTests" />
 	<InternalsVisibleTo Include="SytsBackendGen2.Application.Tests" />
   </ItemGroup>
 

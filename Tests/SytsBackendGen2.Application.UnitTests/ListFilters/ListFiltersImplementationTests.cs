@@ -1,10 +1,7 @@
 using AutoMapper;
-using SytsBackendGen2.Application.Common.Exceptions;
-using SytsBackendGen2.Application.DTOs.Kontragents;
 using SytsBackendGen2.Application.UnitTests.Common.DTOs;
 using SytsBackendGen2.Application.UnitTests.Common.Mediators;
 using Xunit;
-using static SytsBackendGen2.Application.UnitTests.Common.ValidationTestsEntites;
 
 namespace SytsBackendGen2.Application.UnitTests.ListFilters;
 

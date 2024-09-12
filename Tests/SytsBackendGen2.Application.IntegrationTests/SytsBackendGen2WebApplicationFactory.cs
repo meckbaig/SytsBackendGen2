@@ -10,9 +10,9 @@ using System.Diagnostics;
 
 namespace SytsBackendGen2.Application.IntegrationTests;
 
-internal class MockesuWebApplicationFactory : WebApplicationFactory<Program>
+internal class SytsBackendGen2WebApplicationFactory : WebApplicationFactory<Program>
 {
-    const string TestConnectionString = "Server=localhost;Port=5433;Database=SytsBackendGen2;User ID=postgres;Password=testtest;";
+    const string TestConnectionString = "Server=localhost;Port=5443;Database=SytsBackendGen2;User ID=postgres;Password=testtest;";
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
@@ -35,7 +35,7 @@ internal class MockesuWebApplicationFactory : WebApplicationFactory<Program>
         string fileName = @"..\..\..\dump-test-database.sql";
 
         string server = "localhost";
-        string port = "5433";
+        string port = "5443";
         string database = "SytsBackendGen2";
         string userId = "postgres";
         string password = "testtest";

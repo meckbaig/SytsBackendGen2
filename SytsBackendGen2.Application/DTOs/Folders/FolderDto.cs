@@ -1,5 +1,7 @@
 using AutoMapper;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using System.Dynamic;
 using SytsBackendGen2.Application.Common.Dtos;
 using SytsBackendGen2.Domain.Entities;
 
@@ -11,11 +13,11 @@ public record FolderDto : IBaseDto
     public string Name { get; set; }
     public DateTime? LastChannelsUpdate { get; set; }
     public DateTime? LastVideosAccess { get; set; }
-    public JArray SubChannels { get; set; }
+    public List<SubChannelDto> SubChannels { get; set; }
     public int ChannelsCount { get; set; } = 0;
     public string? Color { get; set; } = "#ffffff";
     public string? Icon { get; set; }
-    public JArray YoutubeFolders { get; set; }
+    public string[] YoutubeFolders { get; set; }
     public AccessDto Access { get; set; }
 
     public static Type GetOriginType()
@@ -29,8 +31,28 @@ public record FolderDto : IBaseDto
         {
             CreateMap<Folder, FolderDto>()
                 .ForMember(m => m.Access, opt => opt.MapFrom(f => f.Access))
-                .ForMember(m => m.SubChannels, opt => opt.MapFrom(f => JArray.Parse(f.SubChannelsJson)))
-                .ForMember(m => m.YoutubeFolders, opt => opt.MapFrom(f => JArray.Parse(f.YoutubeFolders)));
+                .ForMember(m => m.SubChannels, opt => opt.MapFrom(f => ConvertJsonToExpandoList(f.SubChannelsJson)))
+                .ForMember(m => m.YoutubeFolders, opt => opt.MapFrom(f => JsonConvert.DeserializeObject<string[]>(f.YoutubeFolders)));
+        }
+
+        private static List<ExpandoObject> ConvertJsonToExpandoList(string jsonString)
+        {
+            if (string.IsNullOrWhiteSpace(jsonString))
+            {
+                return new List<ExpandoObject>();
+            }
+
+            JArray jsonArray = JArray.Parse(jsonString);
+
+            List<ExpandoObject> expandoList = new List<ExpandoObject>();
+
+            foreach (JObject jsonObject in jsonArray)
+            {
+                ExpandoObject expandoObject = jsonObject.ToObject<ExpandoObject>();
+                expandoList.Add(expandoObject);
+            }
+
+            return expandoList;
         }
     }
 }

@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using SytsBackendGen2.Application.Common.Interfaces;
 using Microsoft.Extensions.Configuration;
+using SytsBackendGen2.Application.DTOs.Folders;
 
 namespace SytsBackendGen2.Infrastructure.VideosFetching;
 
@@ -38,11 +39,11 @@ public class VideoFetcher : IVideoFetcher
         _youtubeKey = configuration["YoutubeKey"];
     }
 
-    private void Initialise(JArray youtubeFolders, int channelsCount)
+    private void Initialise(string[] youtubeFolders, int channelsCount)
     {
         try
         {
-            _youtubeFolders = youtubeFolders.Select(x => (string)x).ToArray();
+            _youtubeFolders = youtubeFolders;
             
             if ((_youtubeFolders?.Length ?? 0) < 1)
                 _youtubeFolders = ["videos", "streams"];
@@ -64,7 +65,7 @@ public class VideoFetcher : IVideoFetcher
     /// Операция формирования списка видео
     /// </summary>
     /// <returns>Статус выполнения операции</returns>
-    public async Task<bool> Fetch(JArray subChannels, JArray youtubeFolders, int channelsCount)
+    public async Task<bool> Fetch(List<SubChannelDto> subChannels, string[] youtubeFolders, int channelsCount)
     {
         Initialise(youtubeFolders, channelsCount);
         try
@@ -72,9 +73,9 @@ public class VideoFetcher : IVideoFetcher
             if (_foldersCount == 0)
                 return false;
             List<Task> channelsTasks = new();
-            foreach (dynamic channelJson in subChannels)
+            foreach (SubChannelDto subChannel in subChannels)
             {
-                channelsTasks.Add(GetChannelVideos(channelJson));
+                channelsTasks.Add(GetChannelVideos(subChannel));
             }
             await Task.WhenAll(channelsTasks);
             List<Task> appendDataTasks = new();
@@ -102,13 +103,13 @@ public class VideoFetcher : IVideoFetcher
     /// <param name="channelJson">Объект канала</param>
     /// <remarks>Объект должен содержать идентификатор, название и иконку канала</remarks>
     /// <returns></returns>
-    private async Task GetChannelVideos(dynamic channelJson)
+    private async Task GetChannelVideos(SubChannelDto subChannel)
     {
         try
         {
             List<Task> channelTasks = new();
-            string channelId = channelJson.channelId;
-            string thumbnail = channelJson.thumbnailUrl;
+            string channelId = subChannel.ChannelId;
+            string thumbnail = subChannel.ThumbnailUrl;
             foreach (string ytFolder in _youtubeFolders)
             {
                 Task task = Task.Run(async () => await GetFolderVideos(channelId, ytFolder, thumbnail, _videosPerChannelFolder));

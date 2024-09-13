@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using System.IdentityModel.Tokens.Jwt;
+using SytsBackendGen2.Infrastructure.Authentification.Jwt;
 
 namespace SytsBackendGen2.Web.Structure
 {
@@ -61,6 +62,19 @@ namespace SytsBackendGen2.Web.Structure
                 if (expires < DateTime.UtcNow)
                 {
                     // If the token has expired, return a 401 Unauthorized status code
+                    context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+                    return;
+                }
+#if RELEASE
+                bool currentDevelopmentMode = false;
+#else
+                bool currentDevelopmentMode = true;
+#endif
+                bool tokenDevelopmentMode = jwtToken.Claims.FirstOrDefault(x => x.Type == CustomClaim.DevelopmentMode)?.Value == "True";
+                Console.WriteLine($"Current development mode: {currentDevelopmentMode}, Token development mode: {tokenDevelopmentMode}");
+                if (!currentDevelopmentMode && tokenDevelopmentMode)
+                {
+                    // If the token has been created in development mode, return a 401 Unauthorized status code
                     context.Response.StatusCode = StatusCodes.Status401Unauthorized;
                     return;
                 }

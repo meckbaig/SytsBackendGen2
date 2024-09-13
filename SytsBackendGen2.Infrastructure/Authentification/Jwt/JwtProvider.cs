@@ -29,6 +29,11 @@ internal sealed class JwtProvider : IJwtProvider
         HashSet<Permission>? customPermissions = null)
     {
         var tokenHandler = new JsonWebTokenHandler();
+#if RELEASE
+        bool currentDevelopmentMode = false;
+#else
+                bool currentDevelopmentMode = true;
+#endif
 
         var claims = new List<Claim>
         {
@@ -36,6 +41,7 @@ internal sealed class JwtProvider : IJwtProvider
             new(JwtRegisteredClaimNames.Email, user.Email),
             new(CustomClaim.UserId, user.Id.ToString()),
             new(ClaimTypes.Role, user.Role.Name),
+            new(CustomClaim.DevelopmentMode, currentDevelopmentMode.ToString()),
         };
         foreach (var permission in customPermissions ?? user.Role.Permissions)
         {
@@ -95,4 +101,5 @@ public static class CustomClaim
 {
     public const string UserId = "userId";
     public const string Permissinos = "permissions";
+    public const string DevelopmentMode = "developmentMode";
 }

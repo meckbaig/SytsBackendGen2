@@ -69,7 +69,7 @@ public class RefreshTokenCommandHandler : IRequestHandler<RefreshTokenCommand, R
         if (user == null)
         {
             throw new Common.Exceptions.ValidationException(
-                "JWT token",
+                "jwtToken",
                 [new ErrorItem($"Unable to find user with id {userId}.", ValidationErrorCode.EntityIdValidator)]);
         }
         RefreshToken? token = user.RefreshTokens.FirstOrDefault();

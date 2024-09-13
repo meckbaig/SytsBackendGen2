@@ -116,13 +116,13 @@ public class GetFolderQueryHandler : IRequestHandler<GetFolderQuery, GetFolderRe
         if (folder.Access == AccessEnum.Private && folder.UserId != request.userId)
         {
             throw new ForbiddenAccessException(
-                "JWT token",
+                "jwtToken",
                 [new ErrorItem("User doesn't have access to this folder.", ForbiddenAccessErrorCode.ForbiddenAccessValidator)]);
         }
         if (request.toEdit && folder.UserId != request.userId)
         {
             throw new ForbiddenAccessException(
-                "JWT token",
+                "jwtToken",
                 [new ErrorItem("User doesn't have access to edit this folder.", ForbiddenAccessErrorCode.ForbiddenAccessValidator)]);
         }
     }

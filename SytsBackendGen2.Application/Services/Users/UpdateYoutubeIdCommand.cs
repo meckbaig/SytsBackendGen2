@@ -50,7 +50,7 @@ public class UpdateYoutubeIdCommandHandler : IRequestHandler<UpdateYoutubeIdComm
         if (user == null)
         {
             throw new Common.Exceptions.ValidationException(
-                "JWT token",
+                "jwtToken",
                 [new ErrorItem($"Unable to find user with id {request.userId}.", ValidationErrorCode.EntityIdValidator)]);
         }
 

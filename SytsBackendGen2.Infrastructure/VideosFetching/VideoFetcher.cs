@@ -65,9 +65,9 @@ public class VideoFetcher : IVideoFetcher
     /// Операция формирования списка видео
     /// </summary>
     /// <returns>Статус выполнения операции</returns>
-    public async Task<bool> Fetch(List<SubChannelDto> subChannels, string[] youtubeFolders, int channelsCount)
+    public async Task<bool> Fetch(List<SubChannelDto> subChannels, string[] youtubeFolders)
     {
-        Initialise(youtubeFolders, channelsCount);
+        Initialise(youtubeFolders, subChannels.Count);
         try
         {
             if (_foldersCount == 0)

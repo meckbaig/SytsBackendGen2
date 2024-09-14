@@ -100,7 +100,7 @@ public class GetFolderQueryHandler : IRequestHandler<GetFolderQuery, GetFolderRe
 
     private async Task<List<dynamic>> VideosFetchTask(Folder? folder, FolderDto folderDto)
     {
-        await _videoFetcher.Fetch(folderDto.SubChannels, folderDto.YoutubeFolders, folderDto.ChannelsCount);
+        await _videoFetcher.Fetch(folderDto.SubChannels, folderDto.YoutubeFolders);
         return _videoFetcher.ToList(folder.LastVideoId);
     }
 

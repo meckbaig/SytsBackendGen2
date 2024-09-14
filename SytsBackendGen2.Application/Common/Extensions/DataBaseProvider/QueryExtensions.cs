@@ -1,3 +1,4 @@
+using MediatR;
 using Microsoft.EntityFrameworkCore;
 using SytsBackendGen2.Domain.Entities;
 using SytsBackendGen2.Domain.Entities.Authentification;
@@ -33,5 +34,17 @@ public static class QueryExtensions
         return await folders
             .Include(f => f.Access)
             .FirstOrDefaultAsync(k => k.Guid == guid, cancellationToken);
+    }
+
+    /// <summary>
+    /// Extends the IQueryable of Folder objects by including the UsersCallsToFolder
+    /// where the UserId matches the provided userId.
+    /// </summary>
+    /// <param name="folders">The IQueryable of Folder objects to be extended.</param>
+    /// <param name="userId">The userId to match the UserId of the UsersCallsToFolder.</param>
+    /// <returns>IQueryable of Folder objects with the UsersCallsToFolder for the provided userId included.</returns>
+    public static IQueryable<Folder> WithUserCall(this IQueryable<Folder> folders, int userId)
+    {
+        return folders.Include(f => f.UsersCallsToFolder.Where(uc => uc.UserId == userId)).AsQueryable();
     }
 }

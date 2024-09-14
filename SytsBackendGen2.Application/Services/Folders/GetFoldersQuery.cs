@@ -6,6 +6,7 @@ using SytsBackendGen2.Application.Common.BaseRequests;
 using SytsBackendGen2.Application.Common.BaseRequests.AuthentificatedRequest;
 using SytsBackendGen2.Application.Common.Interfaces;
 using SytsBackendGen2.Application.DTOs.Folders;
+using SytsBackendGen2.Application.Extensions.DataBaseProvider;
 using SytsBackendGen2.Application.Extensions.Validation;
 using SytsBackendGen2.Domain.Entities;
 using SytsBackendGen2.Domain.Enums;
@@ -64,8 +65,8 @@ public class GetFoldersQueryHandler : IRequestHandler<GetFoldersQuery, GetFolder
     private async Task<List<Folder>> GetPrivateFolders(int userId, CancellationToken cancellationToken)
     {
         return await _context.Folders
+            .WithUserCall(userId)
             .Include(f => f.Access)
-            .Include(f => f.UsersCallsToFolder.Where(lv => lv.UserId == userId))
             .Where(f => f.UserId == userId)
             .OrderByDescending(f => f.UsersCallsToFolder.Any())
             .ThenByDescending(f => f.UsersCallsToFolder.FirstOrDefault().LastUserCall)
@@ -75,6 +76,7 @@ public class GetFoldersQueryHandler : IRequestHandler<GetFoldersQuery, GetFolder
     private async Task<List<Folder>> GetPublicFolders(int userId, CancellationToken cancellationToken)
     {
         return await _context.Folders
+            .WithUserCall(userId)
             .Include(f => f.Access)
             .Where(f => (AccessEnum)f.AccessId == AccessEnum.Public && f.UserId != userId)
             .OrderByDescending(f => f.UsersCallsToFolder.Any())

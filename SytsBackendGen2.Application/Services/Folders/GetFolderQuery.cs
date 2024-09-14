@@ -10,6 +10,7 @@ using SytsBackendGen2.Application.Common.Exceptions;
 using SytsBackendGen2.Application.Common.Extensions.Caching;
 using SytsBackendGen2.Application.Common.Interfaces;
 using SytsBackendGen2.Application.DTOs.Folders;
+using SytsBackendGen2.Application.Extensions.DataBaseProvider;
 using SytsBackendGen2.Application.Extensions.Validation;
 using SytsBackendGen2.Domain.Entities;
 using SytsBackendGen2.Domain.Enums;
@@ -66,8 +67,8 @@ public class GetFolderQueryHandler : IRequestHandler<GetFolderQuery, GetFolderRe
     public async Task<GetFolderResponse> Handle(GetFolderQuery request, CancellationToken cancellationToken)
     {
         var folder = await _context.Folders
+            .WithUserCall(request.userId)
             .Include(f => f.Access)
-            .Include(f => f.UsersCallsToFolder.Where(lv => lv.UserId == request.userId))
             .FirstOrDefaultAsync(f => f.Guid == request.guid);
         ValidateFolder(request, folder);
 

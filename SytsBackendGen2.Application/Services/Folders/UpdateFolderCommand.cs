@@ -9,6 +9,7 @@ using SytsBackendGen2.Application.Common.Exceptions;
 using SytsBackendGen2.Application.Common.Extensions.Caching;
 using SytsBackendGen2.Application.Common.Interfaces;
 using SytsBackendGen2.Application.DTOs.Folders;
+using SytsBackendGen2.Application.Extensions.DataBaseProvider;
 using SytsBackendGen2.Application.Extensions.Validation;
 using SytsBackendGen2.Domain.Entities;
 
@@ -58,8 +59,7 @@ public class UpdateFolderCommandHandler : IRequestHandler<UpdateFolderCommand, U
 
     public async Task<UpdateFolderResponse> Handle(UpdateFolderCommand request, CancellationToken cancellationToken)
     {
-        Folder folder = (await _context.Folders
-            .Include(f => f.UsersCallsToFolder.Where(uc => uc.UserId == request.userId))
+        Folder folder = (await _context.Folders.WithUserCall(request.userId)
             .FirstOrDefaultAsync(f => f.Guid == request.guid, cancellationToken))!;
         if (folder.UserId != request.userId)
         {

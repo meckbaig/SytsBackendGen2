@@ -71,7 +71,6 @@ namespace SytsBackendGen2.Web.Structure
                 bool currentDevelopmentMode = true;
 #endif
                 bool tokenDevelopmentMode = jwtToken.Claims.FirstOrDefault(x => x.Type == CustomClaim.DevelopmentMode)?.Value == "True";
-                Console.WriteLine($"Current development mode: {currentDevelopmentMode}, Token development mode: {tokenDevelopmentMode}");
                 if (!currentDevelopmentMode && tokenDevelopmentMode)
                 {
                     // If the token has been created in development mode, return a 401 Unauthorized status code

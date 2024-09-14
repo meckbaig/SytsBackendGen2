@@ -36,3 +36,4 @@ msbuild.wrn
 # Visual Studio 2015
 .vs/
 /SytsBackendGen2.Web/appsettings.Development.json
+/SytsBackendGen2.Web/appsettings.Release.json

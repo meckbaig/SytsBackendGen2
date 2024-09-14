@@ -18,7 +18,7 @@ public class UsersController : ControllerBase
         _mediator = mediator;
     }
 
-    [HttpPost]
+    [HttpPut]
     [HasPermission(Permission.PrivateDataEditor)]
     [Route("UpdateYoutubeId")]
     public async Task<ActionResult<UpdateYoutubeIdResponse>> UpdateYoutubeId([FromBody] UpdateYoutubeIdCommand command)
@@ -29,7 +29,7 @@ public class UsersController : ControllerBase
         return result.ToJsonResponse();
     }
 
-    [HttpPost]
+    [HttpPut]
     [HasPermission(Permission.PrivateDataEditor)]
     [Route("UpdateSubChannels")]
     public async Task<ActionResult<UpdateSubChannelsResponse>> UpdateSubChannelsV1([FromBody] UpdateSubChannelsCommand command)
@@ -40,7 +40,7 @@ public class UsersController : ControllerBase
         return result.ToJsonResponse();
     }
 
-    [HttpPost]
+    [HttpPut]
     [HasPermission(Permission.PrivateDataEditor)]
     [Route("UpdateSubChannels")]
     [ApiVersion("1.1")]

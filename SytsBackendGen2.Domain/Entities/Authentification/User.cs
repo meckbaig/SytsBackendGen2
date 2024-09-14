@@ -4,8 +4,12 @@ using SytsBackendGen2.Domain.Common;
 
 namespace SytsBackendGen2.Domain.Entities.Authentification;
 
-public class User : BaseEntity, INonDelitableEntity
+public class User : BaseEntity, IEntityWithId, INonDelitableEntity
 {
+    [Key]
+    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+    public int Id { get; set; }
+
     [Required]
     [StringLength(320)]
     public string Email { get; set; }

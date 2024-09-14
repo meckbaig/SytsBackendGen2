@@ -5,8 +5,12 @@ using SytsBackendGen2.Domain.Entities.Authentification;
 
 namespace SytsBackendGen2.Domain.Entities;
 
-public class Folder : BaseEntity
+public class Folder : BaseEntity, IEntityWithId
 {
+    [Key]
+    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+    public int Id { get; set; }
+
     [Required]
     public Guid Guid { get; set; }
 

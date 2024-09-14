@@ -10,8 +10,12 @@ using System.Threading.Tasks;
 
 namespace SytsBackendGen2.Domain.Entities.Authentification;
 
-public class Role : BaseEntity
+public class Role : BaseEntity, IEntityWithId
 {
+    [Key]
+    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+    public int Id { get; set; }
+
     [Required]
     [StringLength(100)]
     public string Name { get; set; }

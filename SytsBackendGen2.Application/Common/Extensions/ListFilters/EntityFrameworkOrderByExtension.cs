@@ -22,7 +22,7 @@ public static class EntityFrameworkOrderByExtension
     /// <returns>An <typeparamref name="IOrderedQueryable"/> that contains sorting</returns>
     public static IOrderedQueryable<TSource> AddOrderBy<TSource>
         (this IQueryable<TSource> source, List<Expression>? orderByDelegates)
-        where TSource : BaseEntity
+        where TSource : BaseEntity, IEntityWithId
     {
         if (orderByDelegates == null || orderByDelegates.Count() == 0)
             return source.OrderBy(x => x.Id);

@@ -8,5 +8,5 @@ namespace SytsBackendGen2.Domain.Common;
 
 public interface IEntityWithId
 {
-    int Id { get; }
+    int Id { get; set; }
 }

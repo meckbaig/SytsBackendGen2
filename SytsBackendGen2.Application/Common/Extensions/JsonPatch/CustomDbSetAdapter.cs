@@ -14,7 +14,7 @@ using System.Reflection;
 
 namespace SytsBackendGen2.Application.Extensions.JsonPatch;
 
-public class CustomDbSetAdapter<TEntity> : IAdapter where TEntity : BaseEntity, new()
+public class CustomDbSetAdapter<TEntity> : IAdapter where TEntity : BaseEntity, IEntityWithId, new()
 {
     public bool TryAdd(
         object target,
@@ -348,8 +348,8 @@ public class CustomDbSetAdapter<TEntity> : IAdapter where TEntity : BaseEntity, 
         object value,
         IDbContext context,
         out string errorMessage)
-        where TParent : BaseEntity, new()
-        where TEntityToAdd : BaseEntity, new()
+        where TParent : BaseEntity, IEntityWithId, new()
+        where TEntityToAdd : BaseEntity, IEntityWithId, new()
     {
         try
         {
@@ -416,7 +416,7 @@ public class CustomDbSetAdapter<TEntity> : IAdapter where TEntity : BaseEntity, 
         int entityId,
         IDbContext context,
         out string errorMessage)
-        where TEntityToDelete : BaseEntity, new()
+        where TEntityToDelete : BaseEntity, IEntityWithId, new()
     {
         try
         {
@@ -454,8 +454,8 @@ public class CustomDbSetAdapter<TEntity> : IAdapter where TEntity : BaseEntity, 
         string entitiesInParentPropertyName,
         IDbContext context,
         out string errorMessage)
-        where TParent : BaseEntity, new()
-        where TEntityToDelete : BaseEntity, new()
+        where TParent : BaseEntity, IEntityWithId, new()
+        where TEntityToDelete : BaseEntity, IEntityWithId, new()
     {
         try
         {
@@ -505,7 +505,7 @@ public class CustomDbSetAdapter<TEntity> : IAdapter where TEntity : BaseEntity, 
         IContractResolver contractResolver,
         object value,
         out string errorMessage)
-        where TBaseEntity : BaseEntity, new()
+        where TBaseEntity : BaseEntity, IEntityWithId, new()
     {
         Type? propertyType = typeof(TBaseEntity);
         for (int i = 0; i < segments.Length; i++)
@@ -580,7 +580,7 @@ public class CustomDbSetAdapter<TEntity> : IAdapter where TEntity : BaseEntity, 
         object value,
         IDbContext context,
         out string errorMessage)
-        where TBaseEntity : BaseEntity, new()
+        where TBaseEntity : BaseEntity, IEntityWithId, new()
     {
         try
         {
@@ -619,7 +619,7 @@ public class CustomDbSetAdapter<TEntity> : IAdapter where TEntity : BaseEntity, 
         object value,
         IDbContext context,
         out string errorMessage)
-        where TBaseEntity : BaseEntity, new()
+        where TBaseEntity : BaseEntity, IEntityWithId, new()
     {
         errorMessage = null;
         try

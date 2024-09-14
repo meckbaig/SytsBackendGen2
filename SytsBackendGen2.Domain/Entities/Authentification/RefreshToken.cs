@@ -10,8 +10,12 @@ using System.Threading.Tasks;
 namespace SytsBackendGen2.Domain.Entities.Authentification;
 
 [NotCached]
-public class RefreshToken : BaseEntity
+public class RefreshToken : BaseEntity, IEntityWithId
 {
+    [Key]
+    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+    public int Id { get; set; }
+
     [Required]
     [StringLength(100)]
     public string Token { get; set; }

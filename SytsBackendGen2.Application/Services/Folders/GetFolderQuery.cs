@@ -67,9 +67,11 @@ public class GetFolderQueryHandler : IRequestHandler<GetFolderQuery, GetFolderRe
     {
         var folder = await _context.Folders
             .Include(f => f.Access)
+            .Include(f => f.UsersCallsToFolder.Where(lv => lv.UserId == request.userId))
             .FirstOrDefaultAsync(f => f.Guid == request.guid);
         ValidateFolder(request, folder);
 
+        folder.SetCurrentUserId(request.userId);
         FolderDto folderDto = _mapper.Map<FolderDto>(folder);
         List<VideoDto> videos = null;
 
@@ -77,16 +79,16 @@ public class GetFolderQueryHandler : IRequestHandler<GetFolderQuery, GetFolderRe
         {
             var fetchResult = await _cache.GetOrCreateAsync(
                 request.GetKey(),
-                () => VideosFetchTask(folder, folderDto),
+                () => VideosFetchTask(folder, folderDto, request.userId),
                 _mapper.Map<List<VideoDto>>,
-                cancellationToken, 
+                cancellationToken,
                 request.forceRefresh);
             videos = fetchResult.Data;
 
             if (videos?.FirstOrDefault()?.Id != null && !fetchResult.FetchedFromCache)
             {
-                folder.LastVideoId = videos!.FirstOrDefault()!.Id;
-                folder.LastVideosAccess = folderDto.LastVideosAccess = DateTime.UtcNow;
+                folder.SetLastVideoId(request.userId, videos!.FirstOrDefault()!.Id);
+                folderDto.LastVideosAccess = folder.SetLastVideosCall(request.userId);
                 await _context.SaveChangesAsync(cancellationToken);
             }
         }
@@ -98,10 +100,10 @@ public class GetFolderQueryHandler : IRequestHandler<GetFolderQuery, GetFolderRe
         };
     }
 
-    private async Task<List<dynamic>> VideosFetchTask(Folder? folder, FolderDto folderDto)
+    private async Task<List<dynamic>> VideosFetchTask(Folder? folder, FolderDto folderDto, int userId)
     {
         await _videoFetcher.Fetch(folderDto.SubChannels, folderDto.YoutubeFolders);
-        return _videoFetcher.ToList(folder.LastVideoId);
+        return _videoFetcher.ToList(folder.GetLastVideoId(userId));
     }
 
     private static void ValidateFolder(GetFolderQuery request, Folder? folder)

@@ -49,8 +49,10 @@ public class GetFoldersQueryHandler : IRequestHandler<GetFoldersQuery, GetFolder
         if (request.loggedIn)
         {
             personalFolders = await GetPrivateFolders(request.userId, cancellationToken);
+            personalFolders.ForEach(f => f.SetCurrentUserId(request.userId));
         }
         var publicFolders = await GetPublicFolders(request.userId, cancellationToken);
+        publicFolders.ForEach(f => f.SetCurrentUserId(request.userId));
 
         return new()
         {
@@ -63,8 +65,10 @@ public class GetFoldersQueryHandler : IRequestHandler<GetFoldersQuery, GetFolder
     {
         return await _context.Folders
             .Include(f => f.Access)
+            .Include(f => f.UsersCallsToFolder.Where(lv => lv.UserId == userId))
             .Where(f => f.UserId == userId)
-            .OrderByDescending(f => f.LastChannelsUpdate)
+            .OrderByDescending(f => f.UsersCallsToFolder.Any())
+            .ThenByDescending(f => f.UsersCallsToFolder.FirstOrDefault().LastUserCall)
             .ToListAsync(cancellationToken);
     }
 
@@ -73,6 +77,8 @@ public class GetFoldersQueryHandler : IRequestHandler<GetFoldersQuery, GetFolder
         return await _context.Folders
             .Include(f => f.Access)
             .Where(f => (AccessEnum)f.AccessId == AccessEnum.Public && f.UserId != userId)
+            .OrderByDescending(f => f.UsersCallsToFolder.Any())
+            .ThenByDescending(f => f.UsersCallsToFolder.FirstOrDefault().LastUserCall)
             .Take(50)
             .ToListAsync(cancellationToken);
     }

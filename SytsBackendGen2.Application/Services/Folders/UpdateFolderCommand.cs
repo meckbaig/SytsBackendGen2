@@ -58,7 +58,9 @@ public class UpdateFolderCommandHandler : IRequestHandler<UpdateFolderCommand, U
 
     public async Task<UpdateFolderResponse> Handle(UpdateFolderCommand request, CancellationToken cancellationToken)
     {
-        Folder folder = (await _context.Folders.FirstOrDefaultAsync(f => f.Guid == request.guid, cancellationToken))!;
+        Folder folder = (await _context.Folders
+            .Include(f => f.UsersCallsToFolder.Where(uc => uc.UserId == request.userId))
+            .FirstOrDefaultAsync(f => f.Guid == request.guid, cancellationToken))!;
         if (folder.UserId != request.userId)
         {
             throw new ForbiddenAccessException(
@@ -71,14 +73,14 @@ public class UpdateFolderCommandHandler : IRequestHandler<UpdateFolderCommand, U
         _mapper.Map(request.folder, folder);
         if (previousSubChannels != folder.SubChannelsJson)
         {
-            folder.LastChannelsUpdate = DateTime.UtcNow;
             folder.ChannelsCount = request.folder.SubChannels.Count;
-            folder.LastVideoId = null;
+            folder.SetLastVideoId(request.userId, null);
             _cache.RemoveFromCache(folder.Guid.ToString());
         }
         _context.Folders.Update(folder);
         await _context.SaveChangesAsync(cancellationToken);
 
+        folder.SetCurrentUserId(request.userId);
         return new UpdateFolderResponse() { Folder = _mapper.Map<FolderDto>(folder) };
     }
 }

@@ -32,6 +32,7 @@ public class User : BaseEntity, IEntityWithId, INonDelitableEntity
     public DateTimeOffset? LastChannelsUpdate { get; set; }
 
     public Role Role { get; set; }
+    public List<UserCallToFolder> UserCallsToFolders { get; set; }
     public List<RefreshToken> RefreshTokens { get; set; } = [];
     public List<Folder> Folders { get; set; } = [];
 

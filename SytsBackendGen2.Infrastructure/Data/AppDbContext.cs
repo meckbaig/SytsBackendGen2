@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
+using System.Reflection.Emit;
 using SytsBackendGen2.Application.Common.Interfaces;
 using SytsBackendGen2.Domain.Common;
 using SytsBackendGen2.Domain.Entities;
@@ -31,6 +32,9 @@ public class AppDbContext : DbContext, IAppDbContext
     public DbSet<PermissionInRole> PermissionsInRoles
         => Set<PermissionInRole>();
 
+    public DbSet<UserCallToFolder> UsersCallsToFolders
+        => Set<UserCallToFolder>();
+
     public DbSet<Permission> Permissions
         => Set<Permission>();
 
@@ -48,6 +52,15 @@ public class AppDbContext : DbContext, IAppDbContext
             .HasMany(o => o.Permissions)
             .WithMany(r => r.Roles)
             .UsingEntity<PermissionInRole>();
+
+        builder.Entity<UserCallToFolder>()
+            .HasKey(lv => new { lv.UserId, lv.FolderId });
+        builder.Entity<UserCallToFolder>()
+            .HasOne(lv => lv.User).WithMany(u => u.UserCallsToFolders)
+            .HasForeignKey(v => v.UserId);
+        builder.Entity<UserCallToFolder>()
+            .HasOne(lv => lv.Folder).WithMany(v => v.UsersCallsToFolder)
+            .HasForeignKey(v => v.FolderId);
 
         base.OnModelCreating(builder);
     }

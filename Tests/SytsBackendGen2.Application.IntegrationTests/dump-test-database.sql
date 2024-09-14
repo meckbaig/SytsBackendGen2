@@ -157,6 +157,18 @@ CREATE TABLE public."Users" (
 
 ALTER TABLE public."Users" OWNER TO postgres;
 
+CREATE TABLE public."UsersCallsToFolders" (
+    "UserId" integer NOT NULL,
+    "FolderId" integer NOT NULL,
+    "LastVideoId" character(11),
+    "LastModified" timestamp with time zone,
+    "Created" timestamp with time zone,
+    "LastUserCall" timestamp with time zone
+);
+
+
+ALTER TABLE public."UsersCallsToFolders" OWNER TO postgres;
+
 
 ALTER TABLE public."Users" ALTER COLUMN "Id" ADD GENERATED ALWAYS AS IDENTITY (
     SEQUENCE NAME public."Users_Id_seq"
@@ -220,58 +232,48 @@ ALTER TABLE ONLY public."Access"
 
 ALTER TABLE ONLY public."Folders"
     ADD CONSTRAINT "Folders_pkey" PRIMARY KEY ("Id");
-
+    
+ALTER TABLE ONLY public."UsersCallsToFolders"
+    ADD CONSTRAINT "LastVideosInFolders_pkey" PRIMARY KEY ("UserId", "FolderId");
 
 ALTER TABLE ONLY public."Permissions"
     ADD CONSTRAINT "Permission_pkey" PRIMARY KEY ("Id");
 
-
 ALTER TABLE ONLY public."PermissionsInRoles"
     ADD CONSTRAINT "Permissions_In_Roles_pkey" PRIMARY KEY ("PermissionId", "RoleId");
-
 
 ALTER TABLE ONLY public."RefreshTokens"
     ADD CONSTRAINT "RefreshToken_pkey" PRIMARY KEY ("Id");
 
-
-
 ALTER TABLE ONLY public."Roles"
     ADD CONSTRAINT "Role_pkey" PRIMARY KEY ("Id");
-
 
 ALTER TABLE ONLY public."Users"
     ADD CONSTRAINT "Users_pkey" PRIMARY KEY ("Id");
 
-
 ALTER TABLE ONLY public."Folders"
     ADD CONSTRAINT folders_unique UNIQUE ("Guid");
 
-
 ALTER TABLE ONLY public."Folders"
     ADD CONSTRAINT "Access_FK" FOREIGN KEY ("AccessId") REFERENCES public."Access"("Id") ON UPDATE CASCADE ON DELETE CASCADE;
-
-
+        
+ALTER TABLE ONLY public."UsersCallsToFolders"
+    ADD CONSTRAINT "Folder_FK" FOREIGN KEY ("FolderId") REFERENCES public."Folders"("Id") ON UPDATE CASCADE ON DELETE CASCADE;
 
 ALTER TABLE ONLY public."PermissionsInRoles"
     ADD CONSTRAINT "Permission_FK" FOREIGN KEY ("PermissionId") REFERENCES public."Permissions"("Id") ON UPDATE CASCADE ON DELETE CASCADE;
 
-
-
 ALTER TABLE ONLY public."Users"
     ADD CONSTRAINT "RoleId" FOREIGN KEY ("RoleId") REFERENCES public."Roles"("Id");
-
 
 ALTER TABLE ONLY public."PermissionsInRoles"
     ADD CONSTRAINT "Role_FK" FOREIGN KEY ("RoleId") REFERENCES public."Roles"("Id") ON UPDATE CASCADE ON DELETE CASCADE;
 
-
 ALTER TABLE ONLY public."Folders"
     ADD CONSTRAINT "Users_FK" FOREIGN KEY ("UserId") REFERENCES public."Users"("Id") ON UPDATE CASCADE ON DELETE CASCADE;
 
-
 ALTER TABLE ONLY public."RefreshTokens"
     ADD CONSTRAINT "Users_FK" FOREIGN KEY ("UserId") REFERENCES public."Users"("Id") ON UPDATE CASCADE ON DELETE CASCADE;
-
 
 REVOKE USAGE ON SCHEMA public FROM PUBLIC;
 GRANT ALL ON SCHEMA public TO PUBLIC;

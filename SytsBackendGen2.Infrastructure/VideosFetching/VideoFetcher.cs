@@ -21,7 +21,7 @@ public class VideoFetcher : IVideoFetcher
     private string[] _youtubeFolders;
     private int _foldersCount;
 
-    private int _videosPerChannelFolder;
+    private int _videosPerChannelFolder = int.MaxValue;
     const int _ytRequestVideosCount = 50;
 
     List<dynamic> _notReadyVideosList = new List<dynamic>();
@@ -49,7 +49,7 @@ public class VideoFetcher : IVideoFetcher
                 _youtubeFolders = ["videos", "streams"];
             if (channelsCount > 0)
             {
-                _videosPerChannelFolder = 800 / channelsCount / _youtubeFolders.Length;
+                //_videosPerChannelFolder = 800 / channelsCount / _youtubeFolders.Length;
                 _foldersCount = channelsCount * _youtubeFolders.Length;
             }
             else
@@ -152,6 +152,7 @@ public class VideoFetcher : IVideoFetcher
             for (int i = 0; i < videosPerFolderCount; i++)
             {
                 dynamic videoContent = contents[i];
+                string con = JsonConvert.SerializeObject(videoContent);
                 Task task = Task.Run(() => GetVideo(channelId, channelThumbnail, videoAdditionLocker, videos, videoContent));
                 videosTasks.Add(task);
             }

@@ -26,7 +26,7 @@ public record GetFolderQuery : BaseAuthentificatedRequest<GetFolderResponse>
     internal override int userId { get; set; }
 
     public void SetFolderGuid(Guid guid) => this.guid = guid;
-    public override string GetKey() => guid.ToString();
+    public override string GetKey() => $"{nameof(GetFolderQuery)}:{guid}-userId:{userId}";
 }
 
 public class GetFolderResponse : BaseResponse

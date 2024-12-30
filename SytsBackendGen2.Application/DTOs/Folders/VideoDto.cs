@@ -11,7 +11,7 @@ public class VideoDto : IBaseDto
     public string Title { get; set; }
     public string SimpleLength { get; set; }
     public string ViewCount { get; set; }
-    public string PublishedAt { get; set; }
+    public DateTimeOffset PublishedAt { get; set; }
     public string ChannelId { get; set; }
     public string ChannelTitle { get; set; }
     public string ChannelThumbnail { get; set; }
@@ -37,7 +37,7 @@ public class VideoDto : IBaseDto
                 Title = GetValueOrDefault(expandoDict, "title", string.Empty),
                 SimpleLength = GetValueOrDefault(expandoDict, "simpleLength", string.Empty),
                 ViewCount = GetValueOrDefault(expandoDict, "viewCount", string.Empty),
-                PublishedAt = GetValueOrDefault(expandoDict, "publishedAt", string.Empty),
+                PublishedAt = GetValueOrDefault(expandoDict, "publishedAt", DateTimeOffset.MinValue),
                 ChannelId = GetValueOrDefault(expandoDict, "channelId", string.Empty),
                 ChannelTitle = GetValueOrDefault(expandoDict, "channelTitle", string.Empty),
                 ChannelThumbnail = GetValueOrDefault(expandoDict, "channelThumbnail", string.Empty),

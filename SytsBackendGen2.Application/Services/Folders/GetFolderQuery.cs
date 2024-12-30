@@ -92,6 +92,10 @@ public class GetFolderQueryHandler : IRequestHandler<GetFolderQuery, GetFolderRe
                 folderDto.LastVideosAccess = folder.SetLastVideosCall(request.userId);
                 await _context.SaveChangesAsync(cancellationToken);
             }
+            else if (videos?.FirstOrDefault()?.Id != null && request.userId == 0)
+            {
+                folderDto.LastVideosAccess = folder.SetLastVideosCall(request.userId);
+            }
         }
 
         return new GetFolderResponse

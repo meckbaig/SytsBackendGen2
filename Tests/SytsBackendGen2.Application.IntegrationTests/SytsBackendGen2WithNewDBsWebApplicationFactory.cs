@@ -124,7 +124,7 @@ public class MockGoogleAuthProvider : IGoogleAuthProvider
         return Task.FromResult<UserPreviewDto?>(userPreview);
     }
 
-    public Task<string> GetYoutubeIdByName(string username)
+    public Task<string?> GetYoutubeIdByName(string username)
     {
         return Task.FromResult("UCOByaobXOl6YYxUNBxSwe_7");
     }

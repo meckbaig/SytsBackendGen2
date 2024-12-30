@@ -62,5 +62,6 @@ public enum ValidationErrorCode
 
     EntityIdValidator,
     RefreshTokenNotValid,
-    RefreshTokenExpired
+    RefreshTokenExpired,
+    YoutubeIdValidator
 }

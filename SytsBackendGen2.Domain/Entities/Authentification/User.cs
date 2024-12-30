@@ -21,9 +21,8 @@ public class User : BaseEntity, IEntityWithId, INonDelitableEntity
     [Required]
     public bool Deleted { get; set; }
 
-    [Required]
     [StringLength(24)]
-    public string YoutubeId { get; set; }
+    public string? YoutubeId { get; set; }
 
     [Required]
     [Column(TypeName = "json")]

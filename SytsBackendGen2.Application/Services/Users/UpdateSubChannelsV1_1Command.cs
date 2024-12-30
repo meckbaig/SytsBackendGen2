@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore.Storage.Json;
 using Newtonsoft.Json.Linq;
 using SytsBackendGen2.Application.Common.BaseRequests;
 using SytsBackendGen2.Application.Common.BaseRequests.AuthentificatedRequest;
+using SytsBackendGen2.Application.Common.Exceptions;
 using SytsBackendGen2.Application.Common.Interfaces;
 using SytsBackendGen2.Application.DTOs.Folders;
 using SytsBackendGen2.Application.Extensions.Validation;
@@ -53,6 +54,13 @@ public class UpdateSubChannelsV1_1CommandHandler : IRequestHandler<UpdateSubChan
     {
         User user = _context.Users.FirstOrDefault(u => u.Id == request.userId)!;
         HashSet<SubChannelDto> subChannels = new();
+
+        if (user.YoutubeId == null)
+        {
+            throw new Common.Exceptions.ValidationException(
+                "jwtToken",
+                [new ErrorItem($"User does not have defined youtube id.", ValidationErrorCode.YoutubeIdValidator)]);
+        }
 
         subChannels = await GetSubChannels(user.YoutubeId, subChannels, null);
 

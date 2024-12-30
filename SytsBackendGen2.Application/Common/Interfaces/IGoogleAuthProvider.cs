@@ -26,7 +26,10 @@ public interface IGoogleAuthProvider
     /// </summary>
     /// <param name="username">The username to search for.</param>
     /// <returns>A task that represents the asynchronous operation. The task result contains the YouTube channel ID as a string.</returns>
-    Task<string> GetYoutubeIdByName(string username);
+    /// <remarks>
+    /// If the username is not found, the task result will be null.
+    /// </remarks>
+    Task<string?> GetYoutubeIdByName(string username);
 
     /// <summary>
     /// Retrieves a list of subscribed channels for a given YouTube channel ID.

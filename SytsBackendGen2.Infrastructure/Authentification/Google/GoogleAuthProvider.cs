@@ -35,7 +35,7 @@ public class GoogleAuthProvider : IGoogleAuthProvider
         return userDto;
     }
 
-    public async Task<string> GetYoutubeIdByName(string username)
+    public async Task<string?> GetYoutubeIdByName(string username)
     {
         _httpClient.DefaultRequestHeaders.Clear();
         var response = await _httpClient.GetAsync(
@@ -46,6 +46,8 @@ public class GoogleAuthProvider : IGoogleAuthProvider
         var responseData = await response.Content.ReadAsStringAsync();
         var channelsArray = JsonConvert.DeserializeObject<dynamic>(responseData);
 
+        if ((channelsArray?.items?.Count ?? 0) == 0)
+            return null;
         return channelsArray.items[0].id.channelId;
     }
 

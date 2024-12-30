@@ -13,7 +13,7 @@ public record UserPreviewDto : IBaseDto
     public string Email { get; set; }
     public string Role { get; set; }
     public string Picture { get; set; }
-    public string YoutubeId { get; set; }
+    public string? YoutubeId { get; set; }
     public List<SubChannelDto> SubChannels { get; set; }
 
     public static Type GetOriginType()

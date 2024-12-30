@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using SytsBackendGen2.Application.Common.Interfaces;
 using Microsoft.Extensions.Configuration;
 using SytsBackendGen2.Application.DTOs.Folders;
+using System.Dynamic;
 
 namespace SytsBackendGen2.Infrastructure.VideosFetching;
 
@@ -452,7 +453,9 @@ public class VideoFetcher : IVideoFetcher
         }
         string url = "https://content-youtube.googleapis.com/youtube/v3/videos?";
         url += videosIds.ToString();
-        url += $"part=snippet&prettyPrint=true&key={_youtubeKey}";
+        url += $"part=snippet" +
+               $"&part=statistics" +
+               $"&prettyPrint=true&key={_youtubeKey}";
         return url;
     }
 
@@ -472,6 +475,7 @@ public class VideoFetcher : IVideoFetcher
                 tempVideo.title = responseItem.snippet.title;
                 tempVideo.channelTitle = responseItem.snippet.channelTitle;
                 tempVideo.publishedAt = responseItem.snippet.publishedAt;
+                tempVideo.viewCount = responseItem.statistics.viewCount;
                 int maxThumbnail = 0;
                 foreach (var tn in responseItem.snippet.thumbnails) { maxThumbnail++; }
                 tempVideo.maxThumbnail = maxThumbnail;

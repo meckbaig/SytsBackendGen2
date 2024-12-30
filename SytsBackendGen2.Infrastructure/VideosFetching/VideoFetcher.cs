@@ -1,10 +1,6 @@
 ﻿using Newtonsoft.Json.Linq;
 using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using SytsBackendGen2.Application.Common.Interfaces;
 using Microsoft.Extensions.Configuration;
 using SytsBackendGen2.Application.DTOs.Folders;
@@ -262,24 +258,6 @@ public class VideoFetcher : IVideoFetcher
             video.channelThumbnail = channelThumbnail;
             string simpleLength = content.thumbnailOverlays[0].thumbnailOverlayTimeStatusRenderer.text.simpleText;
             video.simpleLength = simpleLength?[0] >= 48 && simpleLength?[0] <= 57 ? simpleLength : "";
-            video.viewCount = content.viewCountText?.simpleText;
-            string? viewCountText = content.viewCountText?.simpleText;
-            if (viewCountText != null)
-            {
-                StringBuilder viewCount = new StringBuilder();
-                foreach (char c in viewCountText)
-                {
-                    if (c >= 48 && c <= 57)
-                    {
-                        viewCount.Append(c);
-                    }
-                    else if (c.ToString() == " " || (c.ToString() == ",")) { viewCount.Append(" "); }
-                    else break;
-                }
-                video.viewCount = viewCount.ToString();
-            }
-            else
-                video.viewCount = "";
             lock (videoAdditionLocker)
             {
                 videos.Add(video);
@@ -455,6 +433,7 @@ public class VideoFetcher : IVideoFetcher
         url += videosIds.ToString();
         url += $"part=snippet" +
                $"&part=statistics" +
+               $"&part=liveStreamingDetails" +
                $"&prettyPrint=true&key={_youtubeKey}";
         return url;
     }
@@ -476,6 +455,14 @@ public class VideoFetcher : IVideoFetcher
                 tempVideo.channelTitle = responseItem.snippet.channelTitle;
                 tempVideo.publishedAt = responseItem.snippet.publishedAt;
                 tempVideo.viewCount = responseItem.statistics.viewCount;
+                dynamic liveStreamingDetails = new ExpandoObject();
+                if (responseItem.liveStreamingDetails?.scheduledStartTime != null)
+                {
+                    liveStreamingDetails.scheduledStartTime = responseItem.liveStreamingDetails?.scheduledStartTime;
+                    liveStreamingDetails.actualStartTime = responseItem.liveStreamingDetails?.actualStartTime;
+                    liveStreamingDetails.concurrentViewers = responseItem.liveStreamingDetails?.concurrentViewers;
+                    tempVideo.liveStreamingDetails = liveStreamingDetails;
+                }
                 int maxThumbnail = 0;
                 foreach (var tn in responseItem.snippet.thumbnails) { maxThumbnail++; }
                 tempVideo.maxThumbnail = maxThumbnail;

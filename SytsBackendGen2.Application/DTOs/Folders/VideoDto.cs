@@ -17,6 +17,8 @@ public class VideoDto : IBaseDto
     public string ChannelThumbnail { get; set; }
     public int MaxThumbnail { get; set; }
     public bool IsNew { get; set; }
+    public LiveStreamingDetailsDto? LiveStreamingDetails { get; set; }
+
     public static Type GetOriginType()
     {
         return typeof(ExpandoObject);
@@ -42,7 +44,8 @@ public class VideoDto : IBaseDto
                 ChannelTitle = GetValueOrDefault(expandoDict, "channelTitle", string.Empty),
                 ChannelThumbnail = GetValueOrDefault(expandoDict, "channelThumbnail", string.Empty),
                 MaxThumbnail = GetValueOrDefault(expandoDict, "maxThumbnail", 0),
-                IsNew = GetValueOrDefault(expandoDict, "isNew", false)
+                IsNew = GetValueOrDefault(expandoDict, "isNew", false),
+                LiveStreamingDetails = GetLiveStreamingDetails(expandoDict, "liveStreamingDetails")
             };
             return videoDto;
         }
@@ -53,9 +56,34 @@ public class VideoDto : IBaseDto
             {
                 if (value is T result)
                     return result;
+                if (value == null)
+                    return defaultValue;
                 return (T)Convert.ChangeType(value, typeof(T));
             }
             return defaultValue;
         }
+
+        private LiveStreamingDetailsDto? GetLiveStreamingDetails(IDictionary<string, object> dictionary, string key)
+        {
+            if (!dictionary.ContainsKey(key))
+                return null;
+
+            var liveStreamingDetails = dictionary[key] as IDictionary<string, object>;
+            if (!liveStreamingDetails.TryGetValue("scheduledStartTime", out var _)) 
+                return null;
+            return new LiveStreamingDetailsDto
+            {
+                ScheduledStartTime = GetValueOrDefault(liveStreamingDetails, "scheduledStartTime", DateTimeOffset.MinValue),
+                ActualStartTime = GetValueOrDefault(liveStreamingDetails, "actualStartTime", (DateTimeOffset?)null),
+                ConcurrentViewers = GetValueOrDefault(liveStreamingDetails, "concurrentViewers", (int?)null)
+            };
+        }
     }
+}
+
+public class LiveStreamingDetailsDto
+{
+    public DateTimeOffset ScheduledStartTime { get; set; }
+    public DateTimeOffset? ActualStartTime { get; set; }
+    public int? ConcurrentViewers { get; set; }
 }
